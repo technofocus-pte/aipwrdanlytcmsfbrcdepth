@@ -70,7 +70,7 @@ trial enabled.
 
     |  |  |
     |----|----|
-    |Name	| Data-FactoryXXXX (XXXX can be a unique number)| 
+    |Name	| +++Data-FactoryXXXX+++ (XXXX can be a unique number)| 
     |Advanced	|Under License mode, select Fabric capacity|
     |Default storage format|	Small semantic model storage format|
 
