@@ -103,8 +103,12 @@ trial enabled.
 
 2.  In the **Create a workspace tab**, enter the following details and
     click on the **Apply** button.
+    |  |  |
+    |---|---|
+    |Name	|+++TrainModel_FabricXX+++ (XX can be a unique number) |
+    |Advanced	|Under License mode, select Fabric capacity|
+    |Default storage format|	Small dataset storage format|
 
-[TABLE]
 
 > ![A screenshot of a computer AI-generated content may be
 > incorrect.](./media/image12.png)
@@ -130,11 +134,10 @@ data files you’re going to analyze.
 > ![](./media/image15.png)
 
 2.  In the **New lakehouse** dialog box, enter
-    +++**TrainModel_Lakehouse+++** in the **Name** field, click on the
+    **+++TrainModel_Lakehouse+++** in the **Name** field, click on the
     **Create** button.
 
-![A screenshot of a computer Description automatically
-generated](./media/image16.png)
+    ![A screenshot of a computer Description automatically generated](./media/image16.png)
 
 3.  A new empty lakehouse will be created. You need to ingest some data
     into the **TrainModel_Lakehouse** for analysis.
@@ -155,7 +158,8 @@ interactive environment in which you can write and run code (in multiple
 languages) as *experiments*.
 
 1.  In the **Lakehouse** page, dropdown the Open notebook and select
-    **New notebook.** ![](./media/image19.png)
+    **New notebook.**
+    ![](./media/image19.png)
 
 2.  After a few seconds, a new notebook containing a single *cell* will
     open. Notebooks are made up of one or more cells that can
@@ -172,13 +176,13 @@ languages) as *experiments*.
 > ![A screenshot of a computer Description automatically
 > generated](./media/image22.png)
 
-When the cell changes to a markdown cell, the text it contains is
-rendered.
+    When the cell changes to a markdown cell, the text it contains is
+    rendered.
 
 4.  Use the **🖉 (Edit**) button to switch the cell to editing mode, then
     delete the content and enter the following text:
 
-> \# Train a machine learning model and track with MLflow
+  +++# Train a machine learning model and track with MLflow+++
 >
 > ![A screenshot of a computer Description automatically
 > generated](./media/image23.png)
@@ -203,31 +207,21 @@ and columns.
 > menu bar, on the **Edit** tab, select **+ Add code cell**.
 
 2.  Enter the following code in it:
-
-> \# Azure storage access info for open dataset diabetes
->
-> blob_account_name = "azureopendatastorage"
->
-> blob_container_name = "mlsamples"
->
-> blob_relative_path = "diabetes"
->
-> blob_sas_token = r"" \# Blank since container is Anonymous access
->
-> \# Set Spark config to access blob storage
->
-> wasbs_path = f"wasbs://%s@%s.blob.core.windows.net/%s" %
-> (blob_container_name, blob_account_name, blob_relative_path)
->
-> spark.conf.set("fs.azure.sas.%s.%s.blob.core.windows.net" %
-> (blob_container_name, blob_account_name), blob_sas_token)
->
-> print("Remote blob path: " + wasbs_path)
->
-> \# Spark read parquet, note that it won't load any data yet by now
->
-> df = spark.read.parquet(wasbs_path)
->
+    ```
+    # Azure storage access info for open dataset diabetes
+    blob_account_name = "azureopendatastorage"
+    blob_container_name = "mlsamples"
+    blob_relative_path = "diabetes"
+    blob_sas_token = r"" # Blank since container is Anonymous access
+        
+    # Set Spark config to access  blob storage
+    wasbs_path = f"wasbs://%s@%s.blob.core.windows.net/%s" % (blob_container_name, blob_account_name, blob_relative_path)
+    spark.conf.set("fs.azure.sas.%s.%s.blob.core.windows.net" % (blob_container_name, blob_account_name), blob_sas_token)
+    print("Remote blob path: " + wasbs_path)
+        
+    # Spark read parquet, note that it won't load any data yet by now
+    df = spark.read.parquet(wasbs_path)
+    ```
 > ![](./media/image25.png)
 
 3.  Use the **▷ Run cell** button on the left of the cell to run it.
@@ -246,27 +240,23 @@ and columns.
     to the notebook, and enter the following code in it. Use the **▷ Run
     cell** button on the left of the cell to run it
 
-> codeCopy
->
-> display(df)
+    +++display(df)+++
 
 5.  When the cell command has completed, review the output below the
     cell, which should look similar to this:
 
-![A screenshot of a computer AI-generated content may be
-incorrect.](./media/image27.png)
+    ![A screenshot of a computer AI-generated content may be incorrect.](./media/image27.png)
 
 > The output shows the rows and columns of the diabetes dataset
 
 6.  The data is loaded as a Spark dataframe. Scikit-learn will expect
     the input dataset to be a Pandas dataframe. Run the code below to
     convert your dataset to a Pandas dataframe:
-
-> import pandas as pd
->
-> df = df.toPandas()
->
-> df.head()
+    ```
+    import pandas as pd
+    df = df.toPandas()
+    df.head()
+    ```
 
 ![A screenshot of a computer AI-generated content may be
 incorrect.](./media/image28.png)
@@ -281,72 +271,64 @@ the Scikit-Learn library and track the model with MLflow.
     Code** icon. Click on the **+ Code** icon and enter the following
     code in the cell. Use the **▷ Run cell** button on the left of the
     cell to run it
-
-from sklearn.model_selection import train_test_split
-
-X, y =
-df\[\['AGE','SEX','BMI','BP','S1','S2','S3','S4','S5','S6'\]\].values,
-df\['Y'\].values
-
-X_train, X_test, y_train, y_test = train_test_split(X, y,
-test_size=0.30, random_state=0)
+    ```
+    from sklearn.model_selection import train_test_split
+        
+    X, y = df[['AGE','SEX','BMI','BP','S1','S2','S3','S4','S5','S6']].values, df['Y'].values
+        
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0)
+    ```
 
 > ![A screenshot of a computer AI-generated content may be
 > incorrect.](./media/image29.png)
 
 2.  Add another new code cell to the notebook, enter the following code
     in it, and run it:
-
-> import mlflow
->
-> experiment_name = "experiment-diabetes"
->
-> mlflow.set_experiment(experiment_name)
->
+    ```
+    import mlflow
+    experiment_name = "experiment-diabetes"
+    mlflow.set_experiment(experiment_name)
+    ```
 > ![A screenshot of a computer AI-generated content may be
 > incorrect.](./media/image30.png)
 
-The code creates an MLflow experiment named **experiment-diabetes**.
-Your models will be tracked in this experiment.
+    The code creates an MLflow experiment named **experiment-diabetes**.
+    Your models will be tracked in this experiment.
 
 3.  Add another new code cell to the notebook, enter the following code
     in it, and run it.
+    ```
+    from sklearn.linear_model import LinearRegression
+        
+    with mlflow.start_run():
+       mlflow.autolog()
+        
+       model = LinearRegression()
+       model.fit(X_train, y_train)
+        
+       mlflow.log_param("estimator", "LinearRegression")
+    ```
 
-> from sklearn.linear_model import LinearRegression
->
-> with mlflow.start_run():
->
-> mlflow.autolog()
->
-> model = LinearRegression()
->
-> model.fit(X_train, y_train)
->
-> mlflow.log_param("estimator", "LinearRegression")
-
-![A screenshot of a computer AI-generated content may be
-incorrect.](./media/image31.png)
-
-The code trains a regression model using Linear Regression. Parameters,
-metrics, and artifacts, are automatically logged with MLflow.
-Additionally, you’re logging a parameter called **estimator** with the
-value *LinearRegression*.
+    ![A screenshot of a computer AI-generated content may be incorrect.](./media/image31.png)
+    
+    The code trains a regression model using Linear Regression. Parameters,
+    metrics, and artifacts, are automatically logged with MLflow.
+    Additionally, you’re logging a parameter called **estimator** with the
+    value **LinearRegression**.
 
 4.  Add another new code cell to the notebook, enter the following code
     in it, and run it.
-
-> from sklearn.tree import DecisionTreeRegressor
->
-> with mlflow.start_run():
->
-> mlflow.autolog()
->
-> model = DecisionTreeRegressor(max_depth=5)
->
-> model.fit(X_train, y_train)
->
-> mlflow.log_param("estimator", "DecisionTreeRegressor")
->
+    ```
+    from sklearn.tree import DecisionTreeRegressor
+        
+    with mlflow.start_run():
+       mlflow.autolog()
+        
+       model = DecisionTreeRegressor(max_depth=5) 
+       model.fit(X_train, y_train)
+        
+       mlflow.log_param("estimator", "DecisionTreeRegressor")
+    ```
 > ![A screenshot of a computer AI-generated content may be
 > incorrect.](./media/image32.png)
 
@@ -364,14 +346,12 @@ MLflow library to retrieve your experiments and its details.
     Code** icon below the cell output to add a new code cell to the
     notebook, and enter the following code in it. Use the **▷ Run
     cell** button on the left of the cell to run it
-
-import mlflow
-
-experiments = mlflow.search_experiments()
-
-for exp in experiments:
-
-print(exp.name)
+    ```
+    import mlflow
+    experiments = mlflow.search_experiments()
+    for exp in experiments:
+        print(exp.name)
+    ```
 
 > ![A screenshot of a computer AI-generated content may be
 > incorrect.](./media/image33.png)
@@ -380,25 +360,22 @@ print(exp.name)
     the **+ Code** icon below the cell output to add a new code cell to
     the notebook, and enter the following code in it. Use the **▷ Run
     cell** button on the left of the cell to run it
+    ```
+    experiment_name = "experiment-diabetes"
+    exp = mlflow.get_experiment_by_name(experiment_name)
+    print(exp)
+    ```
 
-experiment_name = "experiment-diabetes"
-
-exp = mlflow.get_experiment_by_name(experiment_name)
-
-print(exp)
-
-![A screenshot of a computer AI-generated content may be
-incorrect.](./media/image34.png)
+    ![A screenshot of a computer AI-generated content may be incorrect.](./media/image34.png)
 
 3.  Using an experiment name, you can retrieve all jobs of that
     experiment. Use the **+ Code** icon below the cell output to add a
     new code cell to the notebook, and enter the following code in it.
     Use the **▷ Run cell** button on the left of the cell to run it.
 
-mlflow.search_runs(exp.experiment_id)
+ +++mlflow.search_runs(exp.experiment_id)+++
 
-![A screenshot of a computer AI-generated content may be
-incorrect.](./media/image35.png)
+  ![A screenshot of a computer AI-generated content may be incorrect.](./media/image35.png)
 
 4.  To more easily compare job runs and outputs, you can configure the
     search to order the results. For example, the following cell orders
@@ -408,11 +385,9 @@ incorrect.](./media/image35.png)
     to the notebook, and enter the following code in it. Use the **▷ Run
     cell** button on the left of the cell to run it.
 
-mlflow.search_runs(exp.experiment_id, order_by=\["start_time DESC"\],
-max_results=2)
+  +++mlflow.search_runs(exp.experiment_id, order_by=["start_time DESC"], max_results=2)+++
 
-![A screenshot of a computer AI-generated content may be
-incorrect.](./media/image36.png)
+   ![A screenshot of a computer AI-generated content may be incorrect.](./media/image36.png)
 
 6.  Finally, you can plot the evaluation metrics of multiple models next
     to each other to easily compare models:
@@ -420,31 +395,21 @@ incorrect.](./media/image36.png)
 7.  Use the **+ Code** icon below the cell output to add a new code cell
     to the notebook, and enter the following code in it. Use the **▷ Run
     cell** button on the left of the cell to run it.
+    ```
+    import matplotlib.pyplot as plt
+       
+    df_results = mlflow.search_runs(exp.experiment_id, order_by=["start_time DESC"], max_results=2)[["metrics.training_r2_score", "params.estimator"]]
+       
+    fig, ax = plt.subplots()
+    ax.bar(df_results["params.estimator"], df_results["metrics.training_r2_score"])
+    ax.set_xlabel("Estimator")
+    ax.set_ylabel("R2 score")
+    ax.set_title("R2 score by Estimator")
+    for i, v in enumerate(df_results["metrics.training_r2_score"]):
+        ax.text(i, v, str(round(v, 2)), ha='center', va='bottom', fontweight='bold')
+    plt.show()
+    ```
 
-> import matplotlib.pyplot as plt
->
-> df_results = mlflow.search_runs(exp.experiment_id,
-> order_by=\["start_time DESC"\],
-> max_results=2)\[\["metrics.training_r2_score", "params.estimator"\]\]
->
-> fig, ax = plt.subplots()
->
-> ax.bar(df_results\["params.estimator"\],
-> df_results\["metrics.training_r2_score"\])
->
-> ax.set_xlabel("Estimator")
->
-> ax.set_ylabel("R2 score")
->
-> ax.set_title("R2 score by Estimator")
->
-> for i, v in enumerate(df_results\["metrics.training_r2_score"\]):
->
-> ax.text(i, v, str(round(v, 2)), ha='center', va='bottom',
-> fontweight='bold')
->
-> plt.show()
->
 > ![A screenshot of a computer code AI-generated content may be
 > incorrect.](./media/image37.png)
 >
@@ -481,24 +446,22 @@ to visually explore them.
 
 4.  Select the two latest runs by checking each box.
 
-![A screenshot of a computer AI-generated content may be
-incorrect.](./media/image44.png)
+    ![A screenshot of a computer AI-generated content may be incorrect.](./media/image44.png)
 
 5.  As a result, your two last runs will be compared to each other in
     the **Metric comparison** pane. By default, the metrics are plotted
     by run name.
 
-![A screenshot of a computer AI-generated content may be
-incorrect.](./media/image45.png)
+    ![A screenshot of a computer AI-generated content may be incorrect.](./media/image45.png)
 
 6.  Select the **🖉** (Edit) button of the graph visualizing the mean
     absolute error for each run.and enter the below details
 
-- Change the **visualization type** to **bar**.
-
-- Change the **X-axis** to **estimator**.
-
-- Select **Replace** and explore the new graph.
+    - Change the **visualization type** to **bar**.
+    
+    - Change the **X-axis** to **estimator**.
+    
+    - Select **Replace** and explore the new graph.
 
 > ![](./media/image46.png)
 
@@ -529,33 +492,30 @@ predictions.
 1.  In the experiment overview, ensure the **View** tab is selected and
     select **Run details**
 
-![A screenshot of a computer AI-generated content may be
-incorrect.](./media/image52.png)
+   ![A screenshot of a computer AI-generated content may be incorrect.](./media/image52.png)
 
-7.  Select the run with the highest Training R2 score and click on
+2.  Select the run with the highest Training R2 score and click on
     the** Save **in the Save run as model box (you may need to scroll to
     the right to see this).
 
 > ![A screenshot of a computer AI-generated content may be
 > incorrect.](./media/image53.png)
 
-8.  Select **Save as ML model** in the newly opened pop-up window,
+3.  Select **Save as ML model** in the newly opened pop-up window,
     select the **model** folder and name the
     model +++**model-diabetes+++**. Now click on the **Save**.
 
-![A screenshot of a computer AI-generated content may be
-incorrect.](./media/image54.png)
+    ![A screenshot of a computer AI-generated content may be incorrect.](./media/image54.png)
+    
+    ![](./media/image55.png)
 
-![](./media/image55.png)
-
-9.  Select **View ML model** in the notification that appears at the top
+4.  Select **View ML model** in the notification that appears at the top
     right of your screen when the model is created. You can also refresh
     the window. The saved model is linked under **Model versions**.
 
-![](./media/image56.png)
-
-![A screenshot of a computer AI-generated content may be
-incorrect.](./media/image57.png)
+    ![](./media/image56.png)
+    
+    ![A screenshot of a computer AI-generated content may be incorrect.](./media/image57.png)
 
 Note that the model, the experiment, and the experiment run are linked,
 allowing you to review how the model is trained.
