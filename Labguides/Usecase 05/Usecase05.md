@@ -72,7 +72,7 @@ Fabric professional and citizen developer experiences.
 
 # **Exercise 1:** Create a Microsoft Fabric workspace
 
-## **Task 1: Sign in to Power BI account 
+## Task 1: Sign in to Power BI account 
 
 1.  Open your browser, navigate to the address bar, and type or paste
     the following URL: +++https://app.fabric.microsoft.com/+++ then
