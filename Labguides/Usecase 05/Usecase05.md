@@ -1,3 +1,5 @@
+## Use case 05-Building a Sales and Geography Data Warehouse for Contoso in Microsoft Fabric
+
 **Introduction**
 
 Contoso, a multinational retail company, is looking to modernize its
@@ -70,7 +72,7 @@ Fabric professional and citizen developer experiences.
 
 # **Exercise 1:** Create a Microsoft Fabric workspace
 
-## **Task 1: Sign in to Power BI account and sign up for the free [Microsoft Fabric trial](https://learn.microsoft.com/en-us/fabric/get-started/fabric-trial)**
+## **Task 1: Sign in to Power BI account 
 
 1.  Open your browser, navigate to the address bar, and type or paste
     the following URL: +++https://app.fabric.microsoft.com/+++ then
@@ -84,7 +86,7 @@ Fabric professional and citizen developer experiences.
 > ![](./media/image2.png)
 
 3.  Then, In the **Microsoft** window enter the password and click on
-    the **Sign in** button**.**
+    the **Sign in** button.
 
 > ![](./media/image3.png)
 
@@ -110,7 +112,13 @@ trial enabled.
 2.  In the **Create a workspace tab, enter** the following details and
     click on the **Apply** button.
 
-[TABLE]
+    |  |  |
+    |----|---|
+    |Name	|+++Warehouse_FabricXXXX+++ (XXXX can be a unique number) |
+    |Description	|This workspace contains all the artifacts for the data warehouse|
+    |Advanced	Under License mode| select Fabric capacity|
+    |Default storage format	|Small dataset storage format|
+
 
 > ![A screenshot of a computer AI-generated content may be
 > incorrect.](./media/image7.png)
@@ -162,7 +170,7 @@ trial enabled.
 > incorrect.](./media/image14.png)
 
 3.  On the **New** **pipeline** dialog box, in the **Name** field, enter
-    +++**Load Customer Data+++** and click on the **Create** button.
+    **+++Load Customer Data+++** and click on the **Create** button.
 
 > ![](./media/image15.png)
 
@@ -173,7 +181,7 @@ trial enabled.
 > incorrect.](./media/image16.png)
 
 5.  Navigate and select **Copy data** under **Move
-    &** **transform** section.
+    & transform** section.
 
 > ![A screenshot of a computer AI-generated content may be
 > incorrect.](./media/image17.png)
@@ -187,8 +195,7 @@ trial enabled.
 > ![A screenshot of a computer AI-generated content may be
 > incorrect.](./media/image18.png)
 
-7.  On the **General** tab, in the **Name** field**,** enter +++**CD
-    Load dimension_customer+++** .
+7.  On the **General** tab, in the **Name** field, enter **+++CD Load dimension_customer+++** .
 
 > ![](./media/image19.png)
 
@@ -198,7 +205,7 @@ trial enabled.
 
 > ![](./media/image20.png)
 
-9.  On the **Get data** window, search +++**Azure Blobs+++** in, then
+9.  On the **Get data** window, search **+++Azure Blobs+++** in, then
     click on the **Azure Blob Storage** button.
 
 > ![](./media/image21.png)
@@ -207,36 +214,35 @@ trial enabled.
     configure the following settings and click on the **Connect**
     button.
 
-- In the **Account name or URL**, enter
-  +++**https://fabrictutorialdata.blob.core.windows.net/sampledata/+++**
-
-- In the **Connection credentials** section, click on the dropdown under
-  **Connection**, then select **Create new connection**.
-
-- In **Connection name** field**,** enter +++**Wide World Importers
-  Public Sample+++**.
-
-- Set the **Authentication kind** to **Anonymous**.
-
-![](./media/image22.png)
+    - In the **Account name or URL**, enter
+      **+++https://fabrictutorialdata.blob.core.windows.net/sampledata/+++**
+    
+    - In the **Connection credentials** section, click on the dropdown under
+      **Connection**, then select **Create new connection**.
+    
+    - In **Connection name** field, enter **+++Wide World Importers Public Sample+++**.
+    
+    - Set the **Authentication kind** to **Anonymous**.
+    
+     ![](./media/image22.png)
 
 11. Change the remaining settings on the **Source** page of the copy
     activity as follows to reach the .parquet files
-    in **https://fabrictutorialdata.blob.core.windows.net/sampledata/WideWorldImportersDW/parquet/full/dimension_customer/\*.parquet**
+    in **https://fabrictutorialdata.blob.core.windows.net/sampledata/WideWorldImportersDW/parquet/full/dimension_customer/*.parquet**
 
 12. In the **File path** text boxes, provide:
 
-- **Container:** +++**sampledata+++**
-
-- **File path - Directory:** +++**WideWorldImportersDW/tables+++**
-
-- **File path - File name:** +++**dimension_customer.parquet+++**
-
-- In the **File format** drop down, choose **Parquet** (if you are
-  unable to see **Parquet**, then type in the search box and then select
-  it)
-
-![](./media/image23.png)
+    - **Container:** **+++sampledata+++**
+    
+    - **File path - Directory:** **+++WideWorldImportersDW/tables+++**
+    
+    - **File path - File name:** **+++dimension_customer.parquet+++**
+    
+    - In the **File format** drop down, choose **Parquet** (if you are
+      unable to see **Parquet**, then type in the search box and then select
+      it)
+    
+    ![](./media/image23.png)
 
 13. Click on **Preview data** on the right side of **File path** setting
     to ensure that there are no errors and then click on **close.**
@@ -247,8 +253,13 @@ trial enabled.
 > generated](./media/image25.png)
 
 14. On the **Destination** tab, enter the following settings.
+    |  |  |
+    |---|---|
+    |Connection	|WideWorldImporters|
+    |Table option	|select the Auto create table radio button.|
+    |Data Warehouse|	Drop down, select WideWorldImporters from the list
+    |Table	|•	In the first box enter +++dbo+++                                                                                                            •	In the second box enter +++dimension_customer+++|
 
-[TABLE]
 
 > ![](./media/image26.png)
 
@@ -294,116 +305,67 @@ trial enabled.
 
 4.  In the query editor, paste the following code and select **Run** to
     execute the query
-
-> SQLCopy
->
-> /\*
->
-> 1\. Drop the dimension_city table if it already exists.
->
-> 2\. Create the dimension_city table.
->
-> 3\. Drop the fact_sale table if it already exists.
->
-> 4\. Create the fact_sale table.
->
-> \*/
->
-> --dimension_city
->
-> DROP TABLE IF EXISTS \[dbo\].\[dimension_city\];
->
-> CREATE TABLE \[dbo\].\[dimension_city\]
->
-> (
->
-> \[CityKey\] \[int\] NULL,
->
-> \[WWICityID\] \[int\] NULL,
->
-> \[City\] \[varchar\](8000) NULL,
->
-> \[StateProvince\] \[varchar\](8000) NULL,
->
-> \[Country\] \[varchar\](8000) NULL,
->
-> \[Continent\] \[varchar\](8000) NULL,
->
-> \[SalesTerritory\] \[varchar\](8000) NULL,
->
-> \[Region\] \[varchar\](8000) NULL,
->
-> \[Subregion\] \[varchar\](8000) NULL,
->
-> \[Location\] \[varchar\](8000) NULL,
->
-> \[LatestRecordedPopulation\] \[bigint\] NULL,
->
-> \[ValidFrom\] \[datetime2\](6) NULL,
->
-> \[ValidTo\] \[datetime2\](6) NULL,
->
-> \[LineageKey\] \[int\] NULL
->
-> );
->
-> --fact_sale
->
-> DROP TABLE IF EXISTS \[dbo\].\[fact_sale\];
->
-> CREATE TABLE \[dbo\].\[fact_sale\]
->
-> (
->
-> \[SaleKey\] \[bigint\] NULL,
->
-> \[CityKey\] \[int\] NULL,
->
-> \[CustomerKey\] \[int\] NULL,
->
-> \[BillToCustomerKey\] \[int\] NULL,
->
-> \[StockItemKey\] \[int\] NULL,
->
-> \[InvoiceDateKey\] \[datetime2\](6) NULL,
->
-> \[DeliveryDateKey\] \[datetime2\](6) NULL,
->
-> \[SalespersonKey\] \[int\] NULL,
->
-> \[WWIInvoiceID\] \[int\] NULL,
->
-> \[Description\] \[varchar\](8000) NULL,
->
-> \[Package\] \[varchar\](8000) NULL,
->
-> \[Quantity\] \[int\] NULL,
->
-> \[UnitPrice\] \[decimal\](18, 2) NULL,
->
-> \[TaxRate\] \[decimal\](18, 3) NULL,
->
-> \[TotalExcludingTax\] \[decimal\](29, 2) NULL,
->
-> \[TaxAmount\] \[decimal\](38, 6) NULL,
->
-> \[Profit\] \[decimal\](18, 2) NULL,
->
-> \[TotalIncludingTax\] \[decimal\](38, 6) NULL,
->
-> \[TotalDryItems\] \[int\] NULL,
->
-> \[TotalChillerItems\] \[int\] NULL,
->
-> \[LineageKey\] \[int\] NULL,
->
-> \[Month\] \[int\] NULL,
->
-> \[Year\] \[int\] NULL,
->
-> \[Quarter\] \[int\] NULL
->
-> );
+    ```
+    /*
+    1. Drop the dimension_city table if it already exists.
+    2. Create the dimension_city table.
+    3. Drop the fact_sale table if it already exists.
+    4. Create the fact_sale table.
+    */
+    
+    --dimension_city
+    DROP TABLE IF EXISTS [dbo].[dimension_city];
+    CREATE TABLE [dbo].[dimension_city]
+        (
+            [CityKey] [int] NULL,
+            [WWICityID] [int] NULL,
+            [City] [varchar](8000) NULL,
+            [StateProvince] [varchar](8000) NULL,
+            [Country] [varchar](8000) NULL,
+            [Continent] [varchar](8000) NULL,
+            [SalesTerritory] [varchar](8000) NULL,
+            [Region] [varchar](8000) NULL,
+            [Subregion] [varchar](8000) NULL,
+            [Location] [varchar](8000) NULL,
+            [LatestRecordedPopulation] [bigint] NULL,
+            [ValidFrom] [datetime2](6) NULL,
+            [ValidTo] [datetime2](6) NULL,
+            [LineageKey] [int] NULL
+        );
+    
+    --fact_sale
+    
+    DROP TABLE IF EXISTS [dbo].[fact_sale];
+    
+    CREATE TABLE [dbo].[fact_sale]
+    
+        (
+            [SaleKey] [bigint] NULL,
+            [CityKey] [int] NULL,
+            [CustomerKey] [int] NULL,
+            [BillToCustomerKey] [int] NULL,
+            [StockItemKey] [int] NULL,
+            [InvoiceDateKey] [datetime2](6) NULL,
+            [DeliveryDateKey] [datetime2](6) NULL,
+            [SalespersonKey] [int] NULL,
+            [WWIInvoiceID] [int] NULL,
+            [Description] [varchar](8000) NULL,
+            [Package] [varchar](8000) NULL,
+            [Quantity] [int] NULL,
+            [UnitPrice] [decimal](18, 2) NULL,
+            [TaxRate] [decimal](18, 3) NULL,
+            [TotalExcludingTax] [decimal](29, 2) NULL,
+            [TaxAmount] [decimal](38, 6) NULL,
+            [Profit] [decimal](18, 2) NULL,
+            [TotalIncludingTax] [decimal](38, 6) NULL,
+            [TotalDryItems] [int] NULL,
+            [TotalChillerItems] [int] NULL,
+            [LineageKey] [int] NULL,
+            [Month] [int] NULL,
+            [Year] [int] NULL,
+            [Quarter] [int] NULL
+        );
+    ```
 >
 > ![](./media/image34.png)
 >
@@ -415,7 +377,7 @@ trial enabled.
 > ![](./media/image36.png)
 
 6.  In the **Rename** dialog box, under **Name** field, enter
-    +++**Create Tables+++** to change the name of **SQL query 1**. Then,
+    **+++Create Tables+++** to change the name of **SQL query 1**. Then,
     click on the **Rename** button.
 
 > ![](./media/image37.png)
@@ -444,29 +406,18 @@ methods for loading data.
 
 2.  In the query editor, **paste** the following code, then click on
     **Run** to execute the query.
-
-> SQLCopy
->
-> --Copy data from the public Azure storage account to the
-> dbo.dimension_city table.
->
-> COPY INTO \[dbo\].\[dimension_city\]
->
-> FROM
-> 'https://fabrictutorialdata.blob.core.windows.net/sampledata/WideWorldImportersDW/tables/dimension_city.parquet'
->
-> WITH (FILE_TYPE = 'PARQUET');
->
-> --Copy data from the public Azure storage account to the dbo.fact_sale
-> table.
->
-> COPY INTO \[dbo\].\[fact_sale\]
->
-> FROM
-> 'https://fabrictutorialdata.blob.core.windows.net/sampledata/WideWorldImportersDW/tables/fact_sale.parquet'
->
-> WITH (FILE_TYPE = 'PARQUET');
->
+    ```
+    --Copy data from the public Azure storage account to the dbo.dimension_city table.
+    COPY INTO [dbo].[dimension_city]
+    FROM 'https://fabrictutorialdata.blob.core.windows.net/sampledata/WideWorldImportersDW/tables/dimension_city.parquet'
+    WITH (FILE_TYPE = 'PARQUET');
+    
+    --Copy data from the public Azure storage account to the dbo.fact_sale table.
+    COPY INTO [dbo].[fact_sale]
+    FROM 'https://fabrictutorialdata.blob.core.windows.net/sampledata/WideWorldImportersDW/tables/fact_sale.parquet'
+    WITH (FILE_TYPE = 'PARQUET');
+    
+    ```
 > ![](./media/image41.png)
 
 3.  After the query is completed, review the messages, which indicats
@@ -515,18 +466,13 @@ syntax.
 
 3.  In the query editor, paste the following code to create clones of
     the **dbo.dimension_city** and **dbo.fact_sale** tables.
-
-> SQLCopy
->
-> --Create a clone of the dbo.dimension_city table.
->
-> CREATE TABLE \[dbo\].\[dimension_city1\] AS CLONE OF
-> \[dbo\].\[dimension_city\];
->
-> --Create a clone of the dbo.fact_sale table.
->
-> CREATE TABLE \[dbo\].\[fact_sale1\] AS CLONE OF \[dbo\].\[fact_sale\];
->
+    ```
+    --Create a clone of the dbo.dimension_city table.
+    CREATE TABLE [dbo].[dimension_city1] AS CLONE OF [dbo].[dimension_city];
+    
+    --Create a clone of the dbo.fact_sale table.
+    CREATE TABLE [dbo].[fact_sale1] AS CLONE OF [dbo].[fact_sale];
+    ```
 > ![](./media/image48.png)
 
 4.  Select **Run** to execute the query. The query takes a few seconds
@@ -548,7 +494,7 @@ syntax.
 > ![](./media/image52.png)
 
 7.  In the **Rename** dialog box, under the **Name** field, enter
-    +++**Clone Table+++**, then click on the **Rename** button.
+    **+++Clone Table+++**, then click on the **Rename** button.
 
 > ![A screenshot of a computer Description automatically
 > generated](./media/image53.png)
@@ -570,27 +516,22 @@ syntax.
     named **dbo1**. **Copy paste** and **run** the following T-SQL code
     as shown in the below image:
 
-> SQLCopy
->
-> CREATE SCHEMA dbo1;
+    +++CREATE SCHEMA dbo1+++
 
-![](./media/image55.png)
+    ![](./media/image55.png)
+    
+    ![](./media/image56.png)
 
-![](./media/image56.png)
-
-3.  In the query editor, remove the existing code and paste the following to create clones of the **dbo.dimension_city** and dbo.**fact_sale tables** in the **dbo1** schema.
+3. In the query editor, remove the existing code and paste the following to create clones of the **dbo.dimension_city** and dbo.**fact_sale tables** in the **dbo1** schema.
 
 > **SQLCopy**
->
-> --Create a clone of the dbo.dimension_city table in the dbo1 schema.
->
-> CREATE TABLE \[dbo1\].\[dimension_city1\] AS CLONE OF
-> \[dbo\].\[dimension_city\];
->
-> --Create a clone of the dbo.fact_sale table in the dbo1 schema.
->
-> CREATE TABLE \[dbo1\].\[fact_sale1\] AS CLONE OF
-> \[dbo\].\[fact_sale\];
+    ```
+    --Create a clone of the dbo.dimension_city table in the dbo1 schema.
+    CREATE TABLE [dbo1].[dimension_city1] AS CLONE OF [dbo].[dimension_city];
+    
+    --Create a clone of the dbo.fact_sale table in the dbo1 schema.
+    CREATE TABLE [dbo1].[fact_sale1] AS CLONE OF [dbo].[fact_sale];
+    ```
 
 4.  Select **Run** to execute the query. The query takes a few seconds
     to execute.
@@ -609,14 +550,13 @@ syntax.
 
 > ![](./media/image59.png)
 
-7.  **Rename** the query for reference later. Right-click on **SQL query
-    1** in the **Explorer** and select **Rename**.
+7.  **Rename** the query for reference later. Right-click on **SQL query 1** in the **Explorer** and select **Rename**.
 
 > ![A screenshot of a computer AI-generated content may be
 > incorrect.](./media/image60.png)
 
 8.  In the **Rename** dialog box, under the **Name** field, enter
-    +++**Clone Table in another schema+++**. Then, click on **Rename**
+    **+++Clone Table in another schema+++**. Then, click on **Rename**
     button.
 
 > ![](./media/image61.png)
@@ -640,98 +580,55 @@ Learn how to create and save a new stored procedure to transform data.
     stored procedure **dbo.populate_aggregate_sale_by_city**. This
     stored procedure will create and load
     the **dbo.aggregate_sale_by_date_city** table in a later step.
-
-> SQLCopy
->
-> --Drop the stored procedure if it already exists.
->
-> DROP PROCEDURE IF EXISTS \[dbo\].\[populate_aggregate_sale_by_city\]
->
-> GO
->
-> --Create the populate_aggregate_sale_by_city stored procedure.
->
-> CREATE PROCEDURE \[dbo\].\[populate_aggregate_sale_by_city\]
->
-> AS
->
-> BEGIN
->
-> --If the aggregate table already exists, drop it. Then create the
-> table.
->
-> DROP TABLE IF EXISTS \[dbo\].\[aggregate_sale_by_date_city\];
->
-> CREATE TABLE \[dbo\].\[aggregate_sale_by_date_city\]
->
-> (
->
-> \[Date\] \[DATETIME2\](6),
->
-> \[City\] \[VARCHAR\](8000),
->
-> \[StateProvince\] \[VARCHAR\](8000),
->
-> \[SalesTerritory\] \[VARCHAR\](8000),
->
-> \[SumOfTotalExcludingTax\] \[DECIMAL\](38,2),
->
-> \[SumOfTaxAmount\] \[DECIMAL\](38,6),
->
-> \[SumOfTotalIncludingTax\] \[DECIMAL\](38,6),
->
-> \[SumOfProfit\] \[DECIMAL\](38,2)
->
-> );
->
-> --Reload the aggregated dataset to the table.
->
-> INSERT INTO \[dbo\].\[aggregate_sale_by_date_city\]
->
-> SELECT
->
-> FS.\[InvoiceDateKey\] AS \[Date\],
->
-> DC.\[City\],
->
-> DC.\[StateProvince\],
->
-> DC.\[SalesTerritory\],
->
-> SUM(FS.\[TotalExcludingTax\]) AS \[SumOfTotalExcludingTax\],
->
-> SUM(FS.\[TaxAmount\]) AS \[SumOfTaxAmount\],
->
-> SUM(FS.\[TotalIncludingTax\]) AS \[SumOfTotalIncludingTax\],
->
-> SUM(FS.\[Profit\]) AS \[SumOfProfit\]
->
-> FROM \[dbo\].\[fact_sale\] AS FS
->
-> INNER JOIN \[dbo\].\[dimension_city\] AS DC
->
-> ON FS.\[CityKey\] = DC.\[CityKey\]
->
-> GROUP BY
->
-> FS.\[InvoiceDateKey\],
->
-> DC.\[City\],
->
-> DC.\[StateProvince\],
->
-> DC.\[SalesTerritory\]
->
-> ORDER BY
->
-> FS.\[InvoiceDateKey\],
->
-> DC.\[StateProvince\],
->
-> DC.\[City\];
->
-> END
->
+    ```
+    --Drop the stored procedure if it already exists.
+    DROP PROCEDURE IF EXISTS [dbo].[populate_aggregate_sale_by_city]
+    GO
+    
+    --Create the populate_aggregate_sale_by_city stored procedure.
+    CREATE PROCEDURE [dbo].[populate_aggregate_sale_by_city]
+    AS
+    BEGIN
+        --If the aggregate table already exists, drop it. Then create the table.
+        DROP TABLE IF EXISTS [dbo].[aggregate_sale_by_date_city];
+        CREATE TABLE [dbo].[aggregate_sale_by_date_city]
+            (
+                [Date] [DATETIME2](6),
+                [City] [VARCHAR](8000),
+                [StateProvince] [VARCHAR](8000),
+                [SalesTerritory] [VARCHAR](8000),
+                [SumOfTotalExcludingTax] [DECIMAL](38,2),
+                [SumOfTaxAmount] [DECIMAL](38,6),
+                [SumOfTotalIncludingTax] [DECIMAL](38,6),
+                [SumOfProfit] [DECIMAL](38,2)
+            );
+    
+        --Reload the aggregated dataset to the table.
+        INSERT INTO [dbo].[aggregate_sale_by_date_city]
+        SELECT
+            FS.[InvoiceDateKey] AS [Date], 
+            DC.[City], 
+            DC.[StateProvince], 
+            DC.[SalesTerritory], 
+            SUM(FS.[TotalExcludingTax]) AS [SumOfTotalExcludingTax], 
+            SUM(FS.[TaxAmount]) AS [SumOfTaxAmount], 
+            SUM(FS.[TotalIncludingTax]) AS [SumOfTotalIncludingTax], 
+            SUM(FS.[Profit]) AS [SumOfProfit]
+        FROM [dbo].[fact_sale] AS FS
+        INNER JOIN [dbo].[dimension_city] AS DC
+            ON FS.[CityKey] = DC.[CityKey]
+        GROUP BY
+            FS.[InvoiceDateKey],
+            DC.[City], 
+            DC.[StateProvince], 
+            DC.[SalesTerritory]
+        ORDER BY 
+            FS.[InvoiceDateKey], 
+            DC.[StateProvince], 
+            DC.[City];
+    END
+    ```
+ 
 > ![](./media/image64.png)
 >
 > ![](./media/image65.png)
@@ -767,38 +664,32 @@ Learn how to create and save a new stored procedure to transform data.
 8.  In the query editor, paste the following code. This T-SQL executes
     **dbo.populate_aggregate_sale_by_city** to create the
     **dbo.aggregate_sale_by_date_city** table.Run the query
-
-SQLCopy
-
-> --Execute the stored procedure to create the aggregate table.
->
-> EXEC \[dbo\].\[populate_aggregate_sale_by_city\];
->
+    ```
+    --Execute the stored procedure to create the aggregate table.
+    EXEC [dbo].[populate_aggregate_sale_by_city];
+    ```
 > ![](./media/image71.png)
 
 9.  To save this query for reference later, right-click on the query tab
     just above the editor and select **Rename.**
 
-![A screenshot of a computer AI-generated content may be
-incorrect.](./media/image72.png)
+    ![A screenshot of a computer AI-generated content may be incorrect.](./media/image72.png)
 
 10. In the **Rename** dialog box, under the **Name** field, enter
-    +++**Run** **Create Aggregate Procedure+++**, then click on the
+    **+++Run Create Aggregate Procedure+++**, then click on the
     **Rename** button.
 
-![](./media/image73.png)
+    ![](./media/image73.png)
 
 11. Select the **Refresh** icon on the ribbon.
 
-![A screenshot of a computer AI-generated content may be
-incorrect.](./media/image74.png)
+    ![A screenshot of a computer AI-generated content may be incorrect.](./media/image74.png)
 
 12. In the Object **Explorer** tab, load the data preview to validate
     the data loaded successfully by selecting on
     the **aggregate_sale_by_city** table in the **Explorer**.
 
-![A screenshot of a computer AI-generated content may be
-incorrect.](./media/image75.png)
+    ![A screenshot of a computer AI-generated content may be incorrect.](./media/image75.png)
 
 # Exercise 6: Time travel using T-SQL at statement level
 
@@ -809,95 +700,70 @@ incorrect.](./media/image75.png)
 
 2.  In the query editor, paste the following code to create the
     view Top10CustomerView. Select **Run** to execute the query.
-
-CREATE VIEW dbo.Top10CustomersView
-
-AS
-
-SELECT TOP (10)
-
-    FS.\[CustomerKey\],
-
-    DC.\[Customer\],
-
-    SUM(FS.TotalIncludingTax) AS TotalSalesAmount
-
-FROM
-
-    \[dbo\].\[dimension_customer\] AS DC
-
-INNER JOIN
-
-    \[dbo\].\[fact_sale\] AS FS ON DC.\[CustomerKey\] =
-FS.\[CustomerKey\]
-
-GROUP BY
-
-    FS.\[CustomerKey\],
-
-    DC.\[Customer\]
-
-ORDER BY
-
-    TotalSalesAmount DESC;
-
-![](./media/image77.png)
+    ```
+    CREATE VIEW dbo.Top10CustomersView
+    AS
+    SELECT TOP (10)
+        FS.[CustomerKey],
+        DC.[Customer],
+        SUM(FS.TotalIncludingTax) AS TotalSalesAmount
+    FROM
+        [dbo].[dimension_customer] AS DC
+    INNER JOIN
+        [dbo].[fact_sale] AS FS ON DC.[CustomerKey] = FS.[CustomerKey]
+    GROUP BY
+        FS.[CustomerKey],
+        DC.[Customer]
+    ORDER BY
+        TotalSalesAmount DESC;
+    ```
+    ![](./media/image77.png)
 
 3.  In the **Explorer**, verify that you can see the newly created
     view **Top10CustomersView** by expanding the **View** node
     under dbo schema.
 
-![](./media/image78.png)
+    ![](./media/image78.png)
 
 4.  To save this query for reference later, right-click on the query tab
     just above the editor and select **Rename.**
 
-![](./media/image79.png)
+    ![](./media/image79.png)
 
 5.  In the **Rename** dialog box, under the **Name** field, enter
     +++**Top10CustomersView+++**, then click on the **Rename** button.
 
-![](./media/image80.png)
+    ![](./media/image80.png)
 
 6.  Create another new query, similar to Step 1. From the **Home** tab
     of the ribbon, select **New SQL query**.
 
-![A screenshot of a computer AI-generated content may be
-incorrect.](./media/image81.png)
+    ![A screenshot of a computer AI-generated content may be incorrect.](./media/image81.png)
 
 7.  In the query editor, paste the following code. This updates
     the **TotalIncludingTax** column value to **200000000** for the
     record which has the **SaleKey **value of **22632918.**
     Select **Run** to execute the query.
+    ```
+    /*Update the TotalIncludingTax value of the record with SaleKey value of 22632918*/
+    UPDATE [dbo].[fact_sale]
+    SET TotalIncludingTax = 200000000
+    WHERE SaleKey = 22632918;
+    ```
 
-SQLCopy
-
-/\*Update the TotalIncludingTax value of the record with SaleKey value
-of 22632918\*/
-
-UPDATE \[dbo\].\[fact_sale\]
-
-SET TotalIncludingTax = 200000000
-
-WHERE SaleKey = 22632918;
-
-![](./media/image82.png)
+    ![](./media/image82.png)
 
 8.  In the query editor, paste the following code.
     The CURRENT_TIMESTAMP T-SQL function returns the current UTC
     timestamp as a **datetime**. Select **Run** to execute the query.
-
-SQLCopy
-
-SELECT CURRENT_TIMESTAMP;
-
-![A screenshot of a computer AI-generated content may be
-incorrect.](./media/image83.png)
+    ```
+    SELECT CURRENT_TIMESTAMP;
+    ```
+     ![A screenshot of a computer AI-generated content may be incorrect.](./media/image83.png)
 
 9.  Copy the timestamp value returned to your clipboard.
 
-![A screenshot of a computer AI-generated content may be
-incorrect.](./media/image84.png)
+    ![A screenshot of a computer AI-generated content may be incorrect.](./media/image84.png)
 
 10. Paste the following code in the query editor and replace the
     timestamp value with the current timestamp value obtained from the
@@ -912,35 +778,29 @@ incorrect.](./media/image84.png)
     for **SaleKey** 22632918. Replace the existing code and paste the
     following code and select **Run** to execute the query.
 
-SQLCopy
-
-/\*View of Top10 Customers as of today after record updates\*/
-
-SELECT \*
-
-FROM \[WideWorldImporters\].\[dbo\].\[Top10CustomersView\]
-
-OPTION (FOR TIMESTAMP AS OF '2025-06-09T06:16:08.807');
-
-![](./media/image85.png)
+    SQLCopy
+    ```
+    /*View of Top10 Customers as of today after record updates*/
+    SELECT *
+    FROM [WideWorldImporters].[dbo].[Top10CustomersView]
+    OPTION (FOR TIMESTAMP AS OF '2025-06-09T06:16:08.807');
+    ```
+    
+    
+    ![](./media/image85.png)
 
 13. Paste the following code in the query editor and replace the
     timestamp value to a time prior to executing the update script to
     update the **TotalIncludingTax** value. This would return the list
     of top ten customers *before* the **TotalIncludingTax** was updated
     for **SaleKey** 22632918. Select **Run** to execute the query.
-
-SQLCopy
-
-/\*View of Top10 Customers as of today before record updates\*/
-
-SELECT \*
-
-FROM \[WideWorldImporters\].\[dbo\].\[Top10CustomersView\]
-
-OPTION (FOR TIMESTAMP AS OF '2024-04-24T20:49:06.097');
-
-![](./media/image86.png)
+    ```
+    /*View of Top10 Customers as of today before record updates*/
+    SELECT *
+    FROM [WideWorldImporters].[dbo].[Top10CustomersView]
+    OPTION (FOR TIMESTAMP AS OF '2024-04-24T20:49:06.097');
+    ```
+    ![](./media/image86.png)
 
 # Exercise 7: Create a query with the visual query builder
 
@@ -965,15 +825,15 @@ Fabric portal.
     the dataset size by clicking on **Reduce rows** dropdown, then click
     on **Keep top rows** as shown in the below image.
 
-![](./media/image90.png)
+    ![](./media/image90.png)
 
 4.  In the **Keep top rows** dialog box, enter **10000** and
     Select **OK**.
 
-> ![](./media/image91.png)
->
-> ![A screenshot of a computer Description automatically
-> generated](./media/image92.png)
+    > ![](./media/image91.png)
+    >
+    > ![A screenshot of a computer Description automatically
+    > generated](./media/image92.png)
 
 5.  Right-click on **dimension_city**  and select **Insert into canvas**
 
@@ -986,78 +846,78 @@ Fabric portal.
     **Combine** and select **Merge queries as new** as shown in the
     below image.
 
-![](./media/image95.png)
+    ![](./media/image95.png)
 
 7.  On the **Merge** settings page enter the following details.
 
-- In the **Left table for merge** dropdown, choose **dimension_city**
-
-&nbsp;
-
-- In the **Right table for merge** dropdown, choose **fact_sale** (use
-  horizontal and vertical scroll bar)
-
-&nbsp;
-
-- Select the **CityKey** field in the **dimension_city** table by
-  selecting on the column name in the header row to indicate the join
-  column.
-
-&nbsp;
-
-- Select the **CityKey** field in the **fact_sale** table by selecting
-  on the column name in the header row to indicate the join column.
-
-&nbsp;
-
-- In the **Join kind** diagram selection, choose **Inner** and click on
-  the **Ok** button.
-
-![](./media/image96.png)
-
-![](./media/image97.png)
+    - In the **Left table for merge** dropdown, choose **dimension_city**
+    
+    &nbsp;
+    
+    - In the **Right table for merge** dropdown, choose **fact_sale** (use
+      horizontal and vertical scroll bar)
+    
+    &nbsp;
+    
+    - Select the **CityKey** field in the **dimension_city** table by
+      selecting on the column name in the header row to indicate the join
+      column.
+    
+    &nbsp;
+    
+    - Select the **CityKey** field in the **fact_sale** table by selecting
+      on the column name in the header row to indicate the join column.
+    
+    &nbsp;
+    
+    - In the **Join kind** diagram selection, choose **Inner** and click on
+      the **Ok** button.
+    
+    ![](./media/image96.png)
+    
+    ![](./media/image97.png)
 
 8.  With the **Merge** step selected, select the **Expand** button
     beside **fact_sale** on the header of the data grid as shown in the
     below image, then select the columns **TaxAmount, Profit,
     TotalIncludingTax** and select **Ok.**
 
-![](./media/image98.png)
-
-![](./media/image99.png)
+    ![](./media/image98.png)
+    
+    ![](./media/image99.png)
 
 9.  In the **transformations ribbon,** click on the dropdown beside
     **Transform**, then select **Group by**.
 
-![](./media/image100.png)
+    ![](./media/image100.png)
 
 10. On the **Group by** settings page, enter the following details.
 
-- Select **Advanced** radio button.
-
-- Under **Group by** select the following:
-
-  1.  **Country**
-
-  2.  **StateProvince**
-
-  3.  **City**
-
-- In the **New column name,** enter +++**SumOfTaxAmount+++** in
-  **Operation** column field, select **Sum**, then under **Column**
-  field, select **TaxAmount.** Click on **Add aggregation** to add more
-  aggregate column and operation.
-
-- In the **New column name,** enter +++**SumOfProfit+++** in
-  **Operation** column field, select **Sum**, then under **Column**
-  field, select **Profit**. Click on **Add aggregation** to add more
-  aggregate column and operation.
-
-- In the **New column name**, enter +++**SumOfTotalIncludingTax+++** in
-  **Operation** column field, select **Sum**, then under **Column**
-  field, **TotalIncludingTax.** 
-
-- Click on the **OK** button
+    - Select **Advanced** radio button.
+    
+    - Under **Group by** select the following:
+    
+      1.  **Country**
+    
+      2.  **StateProvince**
+    
+      3.  **City**
+    
+    - In the **New column name,** enter +++**SumOfTaxAmount+++** in
+      **Operation** column field, select **Sum**, then under **Column**
+      field, select **TaxAmount.** Click on **Add aggregation** to add more
+      aggregate column and operation.
+    
+    - In the **New column name,** enter +++**SumOfProfit+++** in
+      **Operation** column field, select **Sum**, then under **Column**
+      field, select **Profit**. Click on **Add aggregation** to add more
+      aggregate column and operation.
+    
+    - In the **New column name**, enter +++**SumOfTotalIncludingTax+++** in
+      **Operation** column field, select **Sum**, then under **Column**
+      field, **TotalIncludingTax.** 
+    
+    - Click on the **OK** button
 
 > ![](./media/image101.png)
 >
@@ -1068,7 +928,7 @@ Fabric portal.
 
 > ![](./media/image103.png)
 
-12. Type +++**Sales Summary+++** to change the name of the query.
+12. Type **+++Sales Summary+++** to change the name of the query.
     Press **Enter** on the keyboard or select anywhere outside the tab
     to save the change.
 
@@ -1096,11 +956,11 @@ Microsoft Fabric workspace:
 > ![A screenshot of a computer AI-generated content may be
 > incorrect.](./media/image106.png)
 
-2.  On the **Synapse Data Engineering Warehouse_FabricXX** home page, under the **Warehouse_FabricXX** pane, click **+New item**, and then select **Lakehouse **under **Stored data**
+2. On the **Synapse Data Engineering Warehouse_FabricXX** home page, under the **Warehouse_FabricXX** pane, click **+New item**, and then select**Lakehouse** under **Stored data**
 
 > ![](./media/image107.png)
 
-3.  In the **Name** field, enter +++**ShortcutExercise+++** and click on
+3.  In the **Name** field, enter **+++ShortcutExercise+++** and click on
     the **Create** button**.**
 
 > ![](./media/image108.png)
@@ -1209,7 +1069,7 @@ Fabric.
 
 5.  Your selected warehouses now show the same **Explorer** pane.
 
-![](./media/image124.png)
+    ![](./media/image124.png)
 
 ## Task 2: Execute a cross-warehouse query
 
@@ -1226,26 +1086,17 @@ the database.schema.table, as in SQL Server.
 2.  In the query editor, copy and paste the following T-SQL code. Select
     the **Run** button to execute the query. After the query is
     completed, you will see the results.
-
-> SQLCopy
->
-> SELECT Sales.StockItemKey,
->
-> Sales.Description,
->
-> SUM(CAST(Sales.Quantity AS int)) AS SoldQuantity,
->
-> c.Customer
->
-> FROM \[dbo\].\[fact_sale\] AS Sales,
->
-> \[ShortcutExercise\].\[dbo\].\[dimension_customer\] AS c
->
-> WHERE Sales.CustomerKey = c.CustomerKey
->
-> GROUP BY Sales.StockItemKey, Sales.Description, c.Customer;
-
-![](./media/image126.png)
+    ```
+    SELECT Sales.StockItemKey, 
+    Sales.Description, 
+    SUM(CAST(Sales.Quantity AS int)) AS SoldQuantity, 
+    c.Customer
+    FROM [dbo].[fact_sale] AS Sales,
+    [ShortcutExercise].[dbo].[dimension_customer] AS c
+    WHERE Sales.CustomerKey = c.CustomerKey
+    GROUP BY Sales.StockItemKey, Sales.Description, c.Customer;
+    ```
+    ![](./media/image126.png)
 
 3.  Rename the query for reference. Right-click on **SQL query** in the
     **Explorer** and select **Rename**.
@@ -1253,7 +1104,7 @@ the database.schema.table, as in SQL Server.
 > ![](./media/image127.png)
 
 4.  In the **Rename** dialog box, under the **Name** field, enter
-    +++**Cross-warehouse query+++**, then click on the **Rename**
+    **+++Cross-warehouse query+++**, then click on the **Rename**
     button. 
 
 > ![](./media/image128.png)
@@ -1309,20 +1160,18 @@ reports.
 12. In the **New relationship window**, complete the following steps to
     create the relationship:
 
-&nbsp;
-
-1)  In the **From table** dropdown list, select
-    the **dimension_city** table.
-
-2)  In the **To table** dropdown list, select the **fact_sale** table.
-
-3)  In the **Cardinality** dropdown list, select **One to many (1:\*)**.
-
-4)  In the **Cross-filter direction** dropdown list, select **Single**.
-
-5)  Check the **Assume referential integrity** box.
-
-6)  Select **Save**.
+      1)  In the **From table** dropdown list, select
+          the **dimension_city** table.
+      
+      2)  In the **To table** dropdown list, select the **fact_sale** table.
+      
+      3)  In the **Cardinality** dropdown list, select **One to many (1:\*)**.
+      
+      4)  In the **Cross-filter direction** dropdown list, select **Single**.
+      
+      5)  Check the **Assume referential integrity** box.
+      
+      6)  Select **Save**.
 
 > ![](./media/image137.png)
 >
@@ -1348,13 +1197,13 @@ semantic model you created in the  task.
 2.  In the report designer, complete the following steps to create a
     column chart visual:
 
-&nbsp;
 
-1)  In the **Data** pane, expand the **fact_sale** table, and then check
-    the **Profit** field.
 
-2)  In the **Data** pane, expand the **dimension_city** table, and then
-    check the **SalesTerritory **field.
+    1)  In the **Data** pane, expand the **fact_sale** table, and then check
+        the **Profit** field.
+    
+    2)  In the **Data** pane, expand the **dimension_city** table, and then
+        check the **SalesTerritory**field.
 
 > ![](./media/image142.png)
 
@@ -1379,15 +1228,13 @@ semantic model you created in the  task.
 
 7.  In the **Data** pane, check the following fields:
 
-&nbsp;
-
-1)  SalesTerritory from the dimension_city table
-
-2)  StateProvince from the dimension_city table
-
-3)  Profit from the fact_sale table
-
-4)  TotalExcludingTax from the fact_sale table
+    1)  SalesTerritory from the **dimension_city** table
+    
+    2)  StateProvince from the **dimension_city** table
+    
+    3)  Profit from the **fact_sale** table
+    
+    4)  TotalExcludingTax from the **fact_sale** table
 
 > ![A screenshot of a computer AI-generated content may be
 > incorrect.](./media/image146.png)
@@ -1408,7 +1255,7 @@ semantic model you created in the  task.
 > incorrect.](./media/image149.png)
 
 10. In the Save your report window, in the Enter a name for your report
-    box, enter +++**Sales Analysis**+++ and Select **Save**
+    box, enter **+++Sales Analysis+++** and Select **Save**
 
 > ![A screenshot of a computer AI-generated content may be
 > incorrect.](./media/image150.png)
