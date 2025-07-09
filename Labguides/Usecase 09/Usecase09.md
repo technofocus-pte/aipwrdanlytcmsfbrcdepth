@@ -5,8 +5,7 @@
 Analyzing structured data has been an easy process for some time but the
 same cannot be said for unstructured data. Unstructured data, such as
 text, images, and videos, is more difficult to analyze and interpret.
-However, with the advent of advanced AI models, such as OpenAI's GPT-3
-and GPT-4, it is now becoming easier to analyze and gain insights from
+However, with the advent of advanced AI models, it is now becoming easier to analyze and gain insights from
 unstructured data.
 
 An example of such analysis is the ability to query a document for
