@@ -1,4 +1,6 @@
-** Introduction**
+## Use Case 02 - Perform Sentiment analysis and Text translation with AI functions in Microsoft Fabric
+
+**Introduction**
 
 Microsoft Fabric now offers powerful AI functions—such as similarity
 scoring, classification, sentiment analysis, entity extraction, grammar
@@ -40,7 +42,12 @@ their data engineering and data science workflows
 > ![A screenshot of a computer AI-generated content may be
 > incorrect.](./media/image1.png)
 
-[TABLE]
+    |  |   |
+    |----|----|
+    |Name|	+++AI-FunctionsXXXX+++ (XX XXcan be a unique number) |
+    |Advanced|	Under License mode, select Fabric capacity |
+    |Default	storage format |Small dataset storage format|
+
 
 2.  In the **Create a workspace tab**, enter the following details and
     click on the **Apply** button.
@@ -64,13 +71,13 @@ their data engineering and data science workflows
 > ![A screenshot of a computer AI-generated content may be
 > incorrect.](./media/image5.png)
 
-4.  In the **Filter by item type** search box, enter +++**Lakehouse+++**
+4.  In the **Filter by item type** search box, enter **+++Lakehouse+++**
     and select the lakehouse item.
 
 > ![A screenshot of a computer AI-generated content may be
 > incorrect.](./media/image6.png)
 
-5.  Enter +++***AI_Functions+++* **as the lakehouse name and
+5.  Enter **+++AI_Functions+++**as the lakehouse name and
     select **Create**. When provisioning is complete, the lakehouse
     explorer page is shown.
 
@@ -99,21 +106,16 @@ pandas or PySpark, depending on your preference.
 
 2.   Replace all the code in the **cell** with the following code and
     click on **▷ Run cell** button and review the output.
-
-\# Install fixed version of packages
-
-%pip install -q --force-reinstall openai==1.30 httpx==0.27.0
-
-\# Install latest version of SynapseML-core
-
-%pip install -q --force-reinstall
-https://mmlspark.blob.core.windows.net/pip/1.0.11-spark3.5/synapseml_core-1.0.11.dev1-py2.py3-none-any.whl
-
-\# Install SynapseML-Internal .whl with AI functions library from blob
-storage:
-
-%pip install -q --force-reinstall
-https://mmlspark.blob.core.windows.net/pip/1.0.11.1-spark3.5/synapseml_internal-1.0.11.1.dev1-py2.py3-none-any.whl
+    ```
+    # Install fixed version of packages
+    %pip install -q --force-reinstall openai==1.30 httpx==0.27.0
+    
+    # Install latest version of SynapseML-core
+    %pip install -q --force-reinstall https://mmlspark.blob.core.windows.net/pip/1.0.11-spark3.5/synapseml_core-1.0.11.dev1-py2.py3-none-any.whl
+    
+    # Install SynapseML-Internal .whl with AI functions library from blob storage:
+    %pip install -q --force-reinstall https://mmlspark.blob.core.windows.net/pip/1.0.11.1-spark3.5/synapseml_internal-1.0.11.1.dev1-py2.py3-none-any.whl
+    ```
 
 > ![A screenshot of a computer AI-generated content may be
 > incorrect.](./media/image11.png)
@@ -136,23 +138,16 @@ https://mmlspark.blob.core.windows.net/pip/1.0.11.1-spark3.5/synapseml_internal-
     dependencies. The pandas cell also imports an optional Python
     library to display progress bars that track the status of every AI
     function call.
-
-> PythonCopy
->
-> \# Required imports
->
-> import synapse.ml.aifunc as aifunc
->
-> import pandas as pd
->
-> import openai
->
-> \# Optional import for progress bars
->
-> from tqdm.auto import tqdm
->
-> tqdm.pandas()
->
+    ```
+    # Required imports
+    import synapse.ml.aifunc as aifunc
+    import pandas as pd
+    import openai
+    
+    # Optional import for progress bars
+    from tqdm.auto import tqdm
+    tqdm.pandas()
+    ```
 > ![](./media/image14.png)
 >
 > ![A screenshot of a computer AI-generated content may be
@@ -172,27 +167,19 @@ that the values are completely unrelated in meaning.
     to the notebook, and enter the following code in it. Click on **▷
     Run cell** button and review the output
 
-> PythonCopy
->
-> \# This code uses AI. Always review output for mistakes.
->
-> \# Read terms:
-> https://azure.microsoft.com/support/legal/preview-supplemental-terms/
->
-> df = pd.DataFrame(\[
->
-> ("Bill Gates", "Microsoft"),
->
-> ("Satya Nadella", "Toyota"),
->
-> ("Joan of Arc", "Nike")
->
-> \], columns=\["names", "companies"\])
->
-> df\["similarity"\] = df\["names"\].ai.similarity(df\["companies"\])
->
-> display(df)
->
+   > PythonCopy
+    ```
+    # This code uses AI. Always review output for mistakes. 
+    # Read terms: https://azure.microsoft.com/support/legal/preview-supplemental-terms/
+    df = pd.DataFrame([ 
+            ("Bill Gates", "Microsoft"), 
+            ("Satya Nadella", "Toyota"), 
+            ("Joan of Arc", "Nike") 
+        ], columns=["names", "companies"])
+        
+    df["similarity"] = df["names"].ai.similarity(df["companies"])
+    display(df)
+    ```
 > ![A screenshot of a computer code AI-generated content may be
 > incorrect.](./media/image16.png)
 >
@@ -208,30 +195,21 @@ to custom labels
     to the notebook, and enter the following code in it. Click on **▷
     Run cell** button and review the output
 
-> PythonCopy
->
-> \# This code uses AI. Always review output for mistakes.
->
-> \# Read terms:
-> https://azure.microsoft.com/support/legal/preview-supplemental-terms/
->
-> df = pd.DataFrame(\[
->
-> "This duvet, lovingly hand-crafted from all-natural fabric, is perfect
-> for a good night's sleep.",
->
-> "Tired of friends judging your baking? With these handy-dandy
-> measuring cups, you'll create culinary delights.",
->
-> "Enjoy this \*BRAND NEW CAR!\* A compact SUV perfect for the
-> professional commuter!"
->
-> \], columns=\["descriptions"\])
->
-> df\["category"\] = df\['descriptions'\].ai.classify("kitchen",
-> "bedroom", "garage", "other")
->
-> display(df)
+   > PythonCopy
+
+    ```
+    # This code uses AI. Always review output for mistakes. 
+    # Read terms: https://azure.microsoft.com/support/legal/preview-supplemental-terms/
+    
+    df = pd.DataFrame([
+            "This duvet, lovingly hand-crafted from all-natural fabric, is perfect for a good night's sleep.",
+            "Tired of friends judging your baking? With these handy-dandy measuring cups, you'll create culinary delights.",
+            "Enjoy this *BRAND NEW CAR!* A compact SUV perfect for the professional commuter!"
+        ], columns=["descriptions"])
+    
+    df["category"] = df['descriptions'].ai.classify("kitchen", "bedroom", "garage", "other")
+    display(df)
+    ```
 
 ![](./media/image18.png)
 
@@ -245,32 +223,22 @@ neutral. If AI can't make this determination, the output is left blank.
     to the notebook, and enter the following code in it. Click on **▷
     Run cell** button and review the output
 
-> PythonCopy
->
-> \# This code uses AI. Always review output for mistakes.
->
-> \# Read terms:
-> https://azure.microsoft.com/support/legal/preview-supplemental-terms/
->
-> df = pd.DataFrame(\[
->
-> "The cleaning spray permanently stained my beautiful kitchen counter.
-> Never again!",
->
-> "I used this sunscreen on my vacation to Florida, and I didn't get
-> burned at all. Would recommend.",
->
-> "I'm torn about this speaker system. The sound was high quality,
-> though it didn't connect to my roommate's phone.",
->
-> "The umbrella is OK, I guess."
->
-> \], columns=\["reviews"\])
->
-> df\["sentiment"\] = df\["reviews"\].ai.analyze_sentiment()
->
-> display(df)
->
+
+    ```
+    # This code uses AI. Always review output for mistakes. 
+    # Read terms: https://azure.microsoft.com/support/legal/preview-supplemental-terms/
+    
+    df = pd.DataFrame([
+            "The cleaning spray permanently stained my beautiful kitchen counter. Never again!",
+            "I used this sunscreen on my vacation to Florida, and I didn't get burned at all. Would recommend.",
+            "I'm torn about this speaker system. The sound was high quality, though it didn't connect to my roommate's phone.",
+            "The umbrella is OK, I guess."
+        ], columns=["reviews"])
+    
+    df["sentiment"] = df["reviews"].ai.analyze_sentiment()
+    display(df)
+    ```
+ 
 > ![](./media/image19.png)
 
 ### Task 4: Extract entities with ai.extract
@@ -283,28 +251,18 @@ example, locations or names.
     to the notebook, and enter the following code in it. Click on **▷
     Run cell** button and review the output
 
-> PythonCopy
->
-> \# This code uses AI. Always review output for mistakes.
->
-> \# Read terms:
-> https://azure.microsoft.com/support/legal/preview-supplemental-terms/
->
-> df = pd.DataFrame(\[
->
-> "MJ Lee lives in Tuscon, AZ, and works as a software engineer for
-> Microsoft.",
->
-> "Kris Turner, a nurse at NYU Langone, is a resident of Jersey City,
-> New Jersey."
->
-> \], columns=\["descriptions"\])
->
-> df_entities = df\["descriptions"\].ai.extract("name", "profession",
-> "city")
->
-> display(df_entities)
->
+    ```
+    # This code uses AI. Always review output for mistakes. 
+    # Read terms: https://azure.microsoft.com/support/legal/preview-supplemental-terms/
+    
+    df = pd.DataFrame([
+            "MJ Lee lives in Tuscon, AZ, and works as a software engineer for Microsoft.",
+            "Kris Turner, a nurse at NYU Langone, is a resident of Jersey City, New Jersey."
+        ], columns=["descriptions"])
+    
+    df_entities = df["descriptions"].ai.extract("name", "profession", "city")
+    display(df_entities)
+    ```
 > ![](./media/image20.png)
 
 ### Task 5: Fix grammar with ai.fix_grammar
@@ -315,28 +273,19 @@ and punctuation of input text.
 1.  Use the **+ Code** icon below the cell output to add a new code cell
     to the notebook, and enter the following code in it. Click on **▷
     Run cell** button and review the output
-
-> PythonCopy
->
-> \# This code uses AI. Always review output for mistakes.
->
-> \# Read terms:
-> https://azure.microsoft.com/support/legal/preview-supplemental-terms/
->
-> df = pd.DataFrame(\[
->
-> "There are an error here.",
->
-> "She and me go weigh back. We used to hang out every weeks.",
->
-> "The big picture are right, but you're details is all wrong."
->
-> \], columns=\["text"\])
->
-> df\["corrections"\] = df\["text"\].ai.fix_grammar()
->
-> display(df)
->
+    ```
+    # This code uses AI. Always review output for mistakes. 
+    # Read terms: https://azure.microsoft.com/support/legal/preview-supplemental-terms/
+    
+    df = pd.DataFrame([
+            "There are an error here.",
+            "She and me go weigh back. We used to hang out every weeks.",
+            "The big picture are right, but you're details is all wrong."
+        ], columns=["text"])
+    
+    df["corrections"] = df["text"].ai.fix_grammar()
+    display(df)
+    ```
 > ![](./media/image21.png)
 
 ### Task 6: Summarize text with ai.summarize
@@ -344,52 +293,30 @@ and punctuation of input text.
 The ai.summarize function invokes AI to generate summaries of input text
 (either values from a single column of a DataFrame, or row values across
 all the columns).
-
-PythonCopy
-
-\# This code uses AI. Always review output for mistakes.
-
-\# Read terms:
-https://azure.microsoft.com/support/legal/preview-supplemental-terms/
-
-df= pd.DataFrame(\[
-
-("Microsoft Teams", "2017",
-
-"""
-
-The ultimate messaging app for your organization—a workspace for
-real-time
-
-collaboration and communication, meetings, file and app sharing, and
-even the
-
-occasional emoji! All in one place, all in the open, all accessible to
-everyone.
-
-"""),
-
-("Microsoft Fabric", "2023",
-
-"""
-
-An enterprise-ready, end-to-end analytics platform that unifies data
-movement,
-
-data processing, ingestion, transformation, and report building into a
-seamless,
-
-user-friendly SaaS experience. Transform raw data into actionable
-insights.
-
-""")
-
-\], columns=\["product", "release_year", "description"\])
-
-df\["summaries"\] = df\["description"\].ai.summarize()
-
-display(df)
-
+1.  Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷ Run cell** button and review the output
+    ```
+    # This code uses AI. Always review output for mistakes. 
+    # Read terms: https://azure.microsoft.com/support/legal/preview-supplemental-terms/
+    
+    df= pd.DataFrame([
+            ("Microsoft Teams", "2017",
+            """
+            The ultimate messaging app for your organization—a workspace for real-time 
+            collaboration and communication, meetings, file and app sharing, and even the 
+            occasional emoji! All in one place, all in the open, all accessible to everyone.
+            """),
+            ("Microsoft Fabric", "2023",
+            """
+            An enterprise-ready, end-to-end analytics platform that unifies data movement, 
+            data processing, ingestion, transformation, and report building into a seamless, 
+            user-friendly SaaS experience. Transform raw data into actionable insights.
+            """)
+        ], columns=["product", "release_year", "description"])
+    
+    df["summaries"] = df["description"].ai.summarize()
+    display(df)
+    ```
 ![A screenshot of a computer AI-generated content may be
 incorrect.](./media/image22.png)
 
@@ -404,28 +331,19 @@ language of your choice.
 1.  Use the **+ Code** icon below the cell output to add a new code cell
     to the notebook, and enter the following code in it. Click on **▷
     Run cell** button and review the output
-
-> PythonCopy
->
-> \# This code uses AI. Always review output for mistakes.
->
-> \# Read terms:
-> https://azure.microsoft.com/support/legal/preview-supplemental-terms/
->
-> df = pd.DataFrame(\[
->
-> "Hello! How are you doing today?",
->
-> "Tell me what you'd like to know, and I'll do my best to help.",
->
-> "The only thing we have to fear is fear itself."
->
-> \], columns=\["text"\])
->
-> df\["translations"\] = df\["text"\].ai.translate("spanish")
->
-> display(df)
->
+    ```
+    # This code uses AI. Always review output for mistakes. 
+    # Read terms: https://azure.microsoft.com/support/legal/preview-supplemental-terms/
+    
+    df = pd.DataFrame([
+            "Hello! How are you doing today?", 
+            "Tell me what you'd like to know, and I'll do my best to help.", 
+            "The only thing we have to fear is fear itself."
+        ], columns=["text"])
+    
+    df["translations"] = df["text"].ai.translate("spanish")
+    display(df)
+    ```
 > ![](./media/image24.png)
 
 ### Task 8: Answer custom user prompts with ai.generate_response
@@ -436,28 +354,19 @@ text based on your own instructions.
 1.  Use the **+ Code** icon below the cell output to add a new code cell
     to the notebook, and enter the following code in it. Click on **▷
     Run cell** button and review the output
-
-> PythonCopy
->
-> \# This code uses AI. Always review output for mistakes.
->
-> \# Read terms:
-> https://azure.microsoft.com/support/legal/preview-supplemental-terms/
->
-> df = pd.DataFrame(\[
->
-> ("Scarves"),
->
-> ("Snow pants"),
->
-> ("Ski goggles")
->
-> \], columns=\["product"\])
->
-> df\["response"\] = df.ai.generate_response("Write a short, punchy
-> email subject line for a winter sale.")
->
-> display(df)
+    ```
+    # This code uses AI. Always review output for mistakes. 
+    # Read terms: https://azure.microsoft.com/support/legal/preview-supplemental-terms/
+    
+    df = pd.DataFrame([
+            ("Scarves"),
+            ("Snow pants"),
+            ("Ski goggles")
+        ], columns=["product"])
+    
+    df["response"] = df.ai.generate_response("Write a short, punchy email subject line for a winter sale.")
+    display(df)
+    ```
 
 ![A screenshot of a computer AI-generated content may be
 incorrect.](./media/image25.png)
