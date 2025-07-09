@@ -2,7 +2,7 @@
 
 **Introduction**
 
-This lab walks you through an end-to-end scenario from data acquisition
+This usecase walks you through an end-to-end scenario from data acquisition
 to data consumption. It helps you build a basic understanding of Fabric,
 including the different experiences and how they integrate, as well as
 the professional and citizen developer experiences that come with
@@ -108,8 +108,13 @@ reports.
 
 2.  In the **Create a workspace** pane that appears on the right side,
     enter the following details, and click on the **Apply** button.
+    |   |   |
+    |-------|-----|
+    |Name|	+++Fabric Lakehouse Tutorial-XXXXX+++ (XXXXX can be Lab instant ID)|
+    |Advanced	|Under License mode, select Fabric capacity|
+    |Default	storage format| Small dataset storage format|
+    |Template apps	|Check the Develop template apps|
 
-[TABLE]
 
 > ![A screenshot of a computer AI-generated content may be
 > incorrect.](./media/image7.png)
@@ -141,7 +146,7 @@ ID.
 > ![A screenshot of a computer AI-generated content may be
 > incorrect.](./media/image12.png)
 
-3.  In the **New lakehouse** dialog box, enter +++**wwilakehouse+++** in
+3.  In the **New lakehouse** dialog box, enter **+++wwilakehouse+++** in
     the **Name** field, click on the **Create** button and open the new
     lakehouse.
 
@@ -171,7 +176,7 @@ ID.
 > ![](./media/image17.png)
 
 3.  Browse to **C:\LabFiles** on your VM, then
-    select ***dimension_customer.csv*** file and click
+    select **dimension_customer.csv** file and click
     on **Open** button.
 
 > ![](./media/image18.png)
@@ -229,13 +234,13 @@ ID.
     can rename or delete these files based on your need. Paste the code
     as shown in the below image, then click on the play icon
     to **Run** the script.
-
-> SELECT BuyingGroup, Count(\*) AS Total
->
-> FROM dimension_customer
->
-> GROUP BY BuyingGroup
->
+    ```
+    SELECT BuyingGroup, Count(*) AS Total
+    
+    FROM dimension_customer
+    
+    GROUP BY BuyingGroup
+    ```
 > ![A screenshot of a computer AI-generated content may be
 > incorrect.](./media/image29.png)
 
@@ -382,7 +387,15 @@ the Wide World Importers (WWI) into the lakehouse.
 6.  In the **Connect to data source** window, enter the details from the
     table below and select **Next**.
 
-[TABLE]
+    |   |   |
+    |----|----|
+    |Property|	Value|
+    |URL	|+++https://assetsprod.microsoft.com/en-us/wwi-sample-dataset.zip+++|
+    |Connection	|Create a new connection|
+    |Connection name	|+++wwisampledata+++|
+    |Data gateway|	None|
+    |Authentication kind|	Anonymous|
+
 
 > ![A screenshot of a computer AI-generated content may be
 > incorrect.](./media/image50.png)
@@ -394,7 +407,7 @@ the Wide World Importers (WWI) into the lakehouse.
 
 > ![](./media/image51.png)
 
-1.  In the **Connect to data destination** window, select **OneLake
+8.  In the **Connect to data destination** window, select **OneLake
     catalog** and select **wwilakehouse.** Now specify the **Root
     folder** as **Files** and click **Next**. This will write the data
     to the **Files** section of the lakehouse.
@@ -404,7 +417,7 @@ the Wide World Importers (WWI) into the lakehouse.
 >
 > ![](./media/image53.png)
 
-2.  Choose the **File format** shoul be  empty for the destination.
+9.  Choose the **File format** shoul be  empty for the destination.
     Click **Next** and then **Save+Run**. You can schedule pipelines to
     refresh data periodically. In this tutorial, we only run the
     pipeline once.
@@ -412,7 +425,7 @@ the Wide World Importers (WWI) into the lakehouse.
 > ![A screenshot of a computer AI-generated content may be
 > incorrect.](./media/image54.png)
 
-3.  The data copy process takes approximately 20-26 minutes to complete.
+10.  The data copy process takes approximately 20-26 minutes to complete.
 
 > ![A screenshot of a computer AI-generated content may be
 > incorrect.](./media/image55.png)
@@ -420,7 +433,7 @@ the Wide World Importers (WWI) into the lakehouse.
 > ![A screenshot of a computer AI-generated content may be
 > incorrect.](./media/image56.png)
 
-4.  Under the Output tab, select **Copy_a1n** to look at the details of
+11.  Under the Output tab, select **Copy_a1n** to look at the details of
     the data transfer. After seeing the **Status** as **Succeeded**,
     click on the **Close** button.
 
@@ -430,20 +443,20 @@ the Wide World Importers (WWI) into the lakehouse.
 > ![A screenshot of a computer AI-generated content may be
 > incorrect.](./media/image58.png)
 
-5.  After the successful execution of the pipeline, go to your lakehouse
+12.  After the successful execution of the pipeline, go to your lakehouse
     (**wwilakehouse**) and open the explorer to see the imported data.
 
 > ![](./media/image59.png)
 
-6.  Verify that the folder **WideWorldImportersDW** is present in
+13.  Verify that the folder **WideWorldImportersDW** is present in
     the **Explorer** view and contains data for all tables.
 
 > ![A screenshot of a computer AI-generated content may be
 > incorrect.](./media/image60.png)
 
-7.  The data is created under the **Files** section of the lakehouse
+14.  The data is created under the **Files** section of the lakehouse
     explorer. A new folder with GUID contains all the needed data.
-    Rename the GUID to +++**wwi-raw-data**+++
+    Rename the GUID to **+++wwi-raw-data+++**
 
 > ![A screenshot of a computer AI-generated content may be
 > incorrect.](./media/image61.png)
@@ -568,24 +581,21 @@ aims to increase individual file size of the written data.
 7.  To execute the second cell, select **Run** icon that appears to the
     left of the cell upon hover.
 
-**Note**: In case, you are unable to see the output, then click on the
-horizontal lines on the left side of **Spark jobs**.
+    **Note**: In case, you are unable to see the output, then click on the
+    horizontal lines on the left side of **Spark jobs**.
+    ```
+    from pyspark.sql.functions import col, year, month, quarter
+    
+    table_name = 'fact_sale'
+    
+    df = spark.read.format("parquet").load('Files/wwi-raw-data/full/fact_sale_1y_full')
+    df = df.withColumn('Year', year(col("InvoiceDateKey")))
+    df = df.withColumn('Quarter', quarter(col("InvoiceDateKey")))
+    df = df.withColumn('Month', month(col("InvoiceDateKey")))
+    
+    df.write.mode("overwrite").format("delta").partitionBy("Year","Quarter").save("Tables/" + table_name)
+    ```
 
-from pyspark.sql.functions import col, year, month, quarter
-
-table_name = 'fact_sale'
-
-df =
-spark.read.format("parquet").load('Files/wwi-raw-data/full/fact_sale_1y_full')
-
-df = df.withColumn('Year', year(col("InvoiceDateKey")))
-
-df = df.withColumn('Quarter', quarter(col("InvoiceDateKey")))
-
-df = df.withColumn('Month', month(col("InvoiceDateKey")))
-
-df.write.mode("overwrite").format("delta").partitionBy("Year","Quarter").save("Tables/" +
-table_name)
 
 >  ![A screenshot of a computer AI-generated content may be
 > incorrect.](./media/image75.png)
@@ -679,15 +689,13 @@ table_name)
     few of the columns, and finally write it as a delta table in
     the **Tables** section of the lakehouse to persist with the data.
 
-In this cell, you create three different Spark dataframes, each
-referencing an existing delta table.
-
-> df_fact_sale = spark.read.table("wwilakehouse.fact_sale")
->
-> df_dimension_date = spark.read.table("wwilakehouse.dimension_date")
->
-> df_dimension_city = spark.read.table("wwilakehouse.dimension_city")
->
+    In this cell, you create three different Spark dataframes, each
+    referencing an existing delta table.
+    ```
+    df_fact_sale = spark.read.table("wwilakehouse.fact_sale") 
+    df_dimension_date = spark.read.table("wwilakehouse.dimension_date")
+    df_dimension_city = spark.read.table("wwilakehouse.dimension_city")
+    ```
 > ![A screenshot of a computer AI-generated content may be
 > incorrect.](./media/image86.png)
 
@@ -695,46 +703,23 @@ referencing an existing delta table.
     earlier, do group by to generate aggregation, rename a few of the
     columns, and finally write it as a delta table in
     the **Tables** section of the lakehouse.
-
-> sale_by_date_city = df_fact_sale.alias("sale") \\
->
-> .join(df_dimension_date.alias("date"), df_fact_sale.InvoiceDateKey ==
-> df_dimension_date.Date, "inner") \\
->
-> .join(df_dimension_city.alias("city"), df_fact_sale.CityKey ==
-> df_dimension_city.CityKey, "inner") \\
->
-> .select("date.Date", "date.CalendarMonthLabel", "date.Day",
-> "date.ShortMonth", "date.CalendarYear", "city.City",
-> "city.StateProvince",
->
-> "city.SalesTerritory", "sale.TotalExcludingTax", "sale.TaxAmount",
-> "sale.TotalIncludingTax", "sale.Profit")\\
->
-> .groupBy("date.Date", "date.CalendarMonthLabel", "date.Day",
-> "date.ShortMonth", "date.CalendarYear", "city.City",
-> "city.StateProvince",
->
-> "city.SalesTerritory")\\
->
-> .sum("sale.TotalExcludingTax", "sale.TaxAmount",
-> "sale.TotalIncludingTax", "sale.Profit")\\
->
-> .withColumnRenamed("sum(TotalExcludingTax)",
-> "SumOfTotalExcludingTax")\\
->
-> .withColumnRenamed("sum(TaxAmount)", "SumOfTaxAmount")\\
->
-> .withColumnRenamed("sum(TotalIncludingTax)",
-> "SumOfTotalIncludingTax")\\
->
-> .withColumnRenamed("sum(Profit)", "SumOfProfit")\\
->
-> .orderBy("date.Date", "city.StateProvince", "city.City")
->
-> sale_by_date_city.write.mode("overwrite").format("delta").option("overwriteSchema",
-> "true").save("Tables/aggregate_sale_by_date_city")
->
+    ```
+    sale_by_date_city = df_fact_sale.alias("sale") \
+    .join(df_dimension_date.alias("date"), df_fact_sale.InvoiceDateKey == df_dimension_date.Date, "inner") \
+    .join(df_dimension_city.alias("city"), df_fact_sale.CityKey == df_dimension_city.CityKey, "inner") \
+    .select("date.Date", "date.CalendarMonthLabel", "date.Day", "date.ShortMonth", "date.CalendarYear", "city.City", "city.StateProvince", 
+     "city.SalesTerritory", "sale.TotalExcludingTax", "sale.TaxAmount", "sale.TotalIncludingTax", "sale.Profit")\
+    .groupBy("date.Date", "date.CalendarMonthLabel", "date.Day", "date.ShortMonth", "date.CalendarYear", "city.City", "city.StateProvince", 
+     "city.SalesTerritory")\
+    .sum("sale.TotalExcludingTax", "sale.TaxAmount", "sale.TotalIncludingTax", "sale.Profit")\
+    .withColumnRenamed("sum(TotalExcludingTax)", "SumOfTotalExcludingTax")\
+    .withColumnRenamed("sum(TaxAmount)", "SumOfTaxAmount")\
+    .withColumnRenamed("sum(TotalIncludingTax)", "SumOfTotalIncludingTax")\
+    .withColumnRenamed("sum(Profit)", "SumOfProfit")\
+    .orderBy("date.Date", "city.StateProvince", "city.City")
+    
+    sale_by_date_city.write.mode("overwrite").format("delta").option("overwriteSchema", "true").save("Tables/aggregate_sale_by_date_city")
+    ```
 > ![A screenshot of a computer program AI-generated content may be
 > incorrect.](./media/image87.png)
 
@@ -746,42 +731,26 @@ referencing an existing delta table.
     write it as a delta table in the **Tables** section of the lakehouse
     to persist with the data.
 
-In this cell, you create a temporary Spark view by joining three tables,
-do group by to generate aggregation, and rename a few of the columns.
-
-%%sql
-
-CREATE OR REPLACE TEMPORARY VIEW sale_by_date_employee
-
-AS
-
-SELECT
-
-DD.Date, DD.CalendarMonthLabel
-
-, DD.Day, DD.ShortMonth Month, CalendarYear Year
-
-,DE.PreferredName, DE.Employee
-
-,SUM(FS.TotalExcludingTax) SumOfTotalExcludingTax
-
-,SUM(FS.TaxAmount) SumOfTaxAmount
-
-,SUM(FS.TotalIncludingTax) SumOfTotalIncludingTax
-
-,SUM(Profit) SumOfProfit
-
-FROM wwilakehouse.fact_sale FS
-
-INNER JOIN wwilakehouse.dimension_date DD ON FS.InvoiceDateKey = DD.Date
-
-INNER JOIN wwilakehouse.dimension_Employee DE ON FS.SalespersonKey =
-DE.EmployeeKey
-
-GROUP BY DD.Date, DD.CalendarMonthLabel, DD.Day, DD.ShortMonth,
-DD.CalendarYear, DE.PreferredName, DE.Employee
-
-ORDER BY DD.Date ASC, DE.PreferredName ASC, DE.Employee ASC
+    In this cell, you create a temporary Spark view by joining three tables,
+    do group by to generate aggregation, and rename a few of the columns.
+    ```
+    %%sql
+    CREATE OR REPLACE TEMPORARY VIEW sale_by_date_employee
+    AS
+    SELECT
+           DD.Date, DD.CalendarMonthLabel
+     , DD.Day, DD.ShortMonth Month, CalendarYear Year
+          ,DE.PreferredName, DE.Employee
+          ,SUM(FS.TotalExcludingTax) SumOfTotalExcludingTax
+          ,SUM(FS.TaxAmount) SumOfTaxAmount
+          ,SUM(FS.TotalIncludingTax) SumOfTotalIncludingTax
+          ,SUM(Profit) SumOfProfit 
+    FROM wwilakehouse.fact_sale FS
+    INNER JOIN wwilakehouse.dimension_date DD ON FS.InvoiceDateKey = DD.Date
+    INNER JOIN wwilakehouse.dimension_Employee DE ON FS.SalespersonKey = DE.EmployeeKey
+    GROUP BY DD.Date, DD.CalendarMonthLabel, DD.Day, DD.ShortMonth, DD.CalendarYear, DE.PreferredName, DE.Employee
+    ORDER BY DD.Date ASC, DE.PreferredName ASC, DE.Employee ASC
+    ```
 
 > ![A screenshot of a computer AI-generated content may be
 > incorrect.](./media/image88.png)
@@ -789,12 +758,10 @@ ORDER BY DD.Date ASC, DE.PreferredName ASC, DE.Employee ASC
 20. In this cell, you read from the temporary Spark view created in the
     previous cell and finally write it as a delta table in
     the **Tables** section of the lakehouse.
-
-21. sale_by_date_employee = spark.sql("SELECT \* FROM
-    sale_by_date_employee")
-
-22. sale_by_date_employee.write.mode("overwrite").format("delta").option("overwriteSchema",
-    "true").save("Tables/aggregate_sale_by_date_employee")
+    ```
+    sale_by_date_employee = spark.sql("SELECT * FROM sale_by_date_employee")
+    sale_by_date_employee.write.mode("overwrite").format("delta").option("overwriteSchema", "true").save("Tables/aggregate_sale_by_date_employee")
+    ```
 
 > ![A screenshot of a computer AI-generated content may be
 > incorrect.](./media/image89.png)
@@ -875,9 +842,11 @@ frequent updates at the source.
 3.  For this data model, you need to define the relationship between
     different tables so that you can create reports and visualizations
     based on data coming across different tables.Click on **Auto
-    layout** ![](./media/image95.png) ![](./media/image96.png)
+    layout**
+    ![](./media/image95.png)
+    ![](./media/image96.png)
 
-4.  From the **fact_sale** table, drag the **CityKey** field and drop it
+5.  From the **fact_sale** table, drag the **CityKey** field and drop it
     on the **CityKey** field in the **dimension_city** table to create a
     relationship. The **Create Relationship** dialog box appears.
 
@@ -1032,7 +1001,8 @@ frequent updates at the source.
     drag **BuyingPackage** into the Legend field well. This selection
     adds a line for each of the Buying Packages.
 
-> ![](./media/image118.png) ![](./media/image119.png)
+> ![](./media/image118.png)
+> ![](./media/image119.png)
 
 17. Click anywhere on the blank canvas (or press the Esc key) so the
     stacked area chart is no longer selected.
