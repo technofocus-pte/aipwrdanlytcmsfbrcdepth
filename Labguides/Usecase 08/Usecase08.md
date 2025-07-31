@@ -252,7 +252,7 @@ The following code reads raw data from the **Files** section of the
 lakehouse, and adds more columns for different date parts. Creation
 of the partitioned delta table uses this information.
 
-2.  Use the **+ Code** icon below the cell output to add a new code cell
+1.  Use the **+ Code** icon below the cell output to add a new code cell
     to the notebook, and enter the following code in it. Click on **▷
     Run cell** button and review the output
 	
