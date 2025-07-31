@@ -1354,6 +1354,8 @@ transform, and load* (ETL) process.
     button.
 
     - **Connection**: Create new connection
+  
+    - **Connection name**:Any name
     
     - **data gateway**: (none)
     
