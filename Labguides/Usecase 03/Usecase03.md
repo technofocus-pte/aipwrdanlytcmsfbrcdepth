@@ -648,7 +648,7 @@ learn more about the methods of the Dataframe object.
     ![A screenshot of a computer AI-generated content may be
     incorrect.](./media/image58.png)
 
-# **Exercise 3: Work with tables and SQL**
+# **Exercise 4: Work with tables and SQL**
 
 As you’ve seen, the native methods of the dataframe object enable you to
 query and analyze data from a file quite effectively. However, many data
@@ -861,7 +861,7 @@ incorrect.](./media/image74.png)
 the [*Spark SQL
 documentation*](https://spark.apache.org/docs/2.2.0/sql-programming-guide.html).
 
-# Exercise 4: Visualize data with Spark
+# Exercise 5: Visualize data with Spark
 
 A picture is proverbially worth a thousand words, and a chart is often
 better than a thousand rows of data. While notebooks in Fabric include a
@@ -1296,7 +1296,7 @@ generated](./media/image103.png)
 ![A screenshot of a computer Description automatically
 generated](./media/image104.png)
 
-# Exercise 5: Create a Dataflow (Gen2) in Microsoft Fabric
+# Exercise 6: Create a Dataflow (Gen2) in Microsoft Fabric
 
 In Microsoft Fabric, Dataflows (Gen2) connect to various data sources
 and perform transformations in Power Query Online. They can then be used
