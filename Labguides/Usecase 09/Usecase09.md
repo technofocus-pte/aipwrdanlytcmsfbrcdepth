@@ -184,7 +184,8 @@ To create a multi-service resource follow these instructions:
 
 3.  On the **Create a secret** page, provide the following information
     and click on **Create** button .
-
+    |    |   |
+    |----|----|
     |Upload |options	Manual|
     |Name|	Enter the name +++aisearchkey+++|
     |Secret Value|	+++password321+++|
@@ -998,3 +999,4 @@ generated](./media/image79.png)
 
 ![A screenshot of a computer Description automatically
 generated](./media/image80.png)
+
