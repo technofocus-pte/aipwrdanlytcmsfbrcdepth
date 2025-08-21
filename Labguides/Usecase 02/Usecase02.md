@@ -1,11 +1,11 @@
-## Use Case 02 - Perform Sentiment analysis and Text translation with AI functions in Microsoft Fabric
+# Use Case 02: Perform Sentiment analysis and Text translation with AI functions in Microsoft Fabric
 
 **Introduction**
 
-Microsoft Fabric now offers powerful AI functions—such as similarity
+Microsoft Fabric now offers powerful AI functions-such as similarity
 scoring, classification, sentiment analysis, entity extraction, grammar
 correction, summarization, translation, and custom response
-generation—that can be seamlessly applied to data within pandas or Spark
+generation-that can be seamlessly applied to data within pandas or Spark
 with a single line of code. These are built on industry-leading LLMs and
 are available with minimal setup, enabling data scientists and analysts
 to effortlessly enhance, transform, and analyze textual data as part of
@@ -14,78 +14,72 @@ their data engineering and data science workflows
 **Objective**
 
 - Set up the Microsoft Fabric notebook environment with required
-  packages and configurations.
-
-- Import and explore sample data using pandas or Spark DataFrames.
-
+  packages and configurations.  
+- Import and explore sample data using pandas or Spark DataFrames.  
 - Apply AI functions like similarity scoring, classification, and
-  sentiment analysis to text columns.
-
+  sentiment analysis to text columns.  
 - Use functions for grammar correction, summarization, and translation
-  on textual data.
-
+  on textual data.  
 - Generate AI-based custom responses using generate_response for various
-  prompts.
-
+  prompts.  
 - Configure AI function behavior using ai func.Conf for custom settings
-  like temperature or timeout.
-
+  like temperature or timeout.  
 - Evaluate and compare original vs AI-transformed outputs to understand
-  their impact.
+  their impact.  
 
 ## Exercise 1: Create a workspace, lakehouse and notebook
 
 ### Task 1: Create a workspace
 
-1.  In the Workspaces pane Select **+** **New Workspace**. 
+1.  click on the **Home** icon on the left-sided
+    navigation pane. Then, in the Workspaces pane select **+ New Workspace**. 
 
-> ![A screenshot of a computer AI-generated content may be
-> incorrect.](./media/image1.png)
+    > ![A screenshot of a computer AI-generated content may be
+    > incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2002/media/image1.png)
+
+2.  In the **Create a workspace tab**, enter the following details and
+    click on the **Apply** button.
 
     |  |   |
     |----|----|
-    |Name|	+++AI-FunctionsXXXX+++ (XX XXcan be a unique number) |
-    |Advanced|	Under License mode, select Fabric capacity |
-    |Default	storage format |Small dataset storage format|
+    |Name|	+++AI-Functions@lab.LabInstance.Id+++ (This must be a unique identifier) |
+    |Advanced|	Under License mode, select **Fabric capacity** |
+    |Default	storage format |**Small dataset storage format**|
 
+    > ![A screenshot of a computer AI-generated content may be
+    > incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2002/media/image2.png)
 
-2.  In the **Create a workspace tab**, enter the following details and
-    click on the **Apply** button.
+    > ![A screenshot of a computer AI-generated content may be
+    > incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2002/media/image3.png)
 
-> ![A screenshot of a computer AI-generated content may be
-> incorrect.](./media/image2.png)
->
-> ![A screenshot of a computer AI-generated content may be
-> incorrect.](./media/image3.png)
-
-3.  Wait for the deployment to complete. It takes 1-2 minutes to
+    >[!note]Wait for the deployment to complete. It takes 1-2 minutes to
     complete. When your new workspace opens, it should be empty.
 
-> ![A screenshot of a computer AI-generated content may be
-> incorrect.](./media/image4.png)
+    > ![A screenshot of a computer AI-generated content may be
+    > incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2002/media/image4.png)
 
 ### Task 2: Create a lakehouse
 
-1.  In the Workspaces pane, select **+ New item**.
+1.  In the Workspaces pane, select **+ New item**.
 
-> ![A screenshot of a computer AI-generated content may be
-> incorrect.](./media/image5.png)
+    > ![A screenshot of a computer AI-generated content may be
+    > incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2002/media/image5.png)
 
-4.  In the **Filter by item type** search box, enter **+++Lakehouse+++**
+4.  In the **Filter by item type** search box, enter **+++Lakehouse+++**
     and select the lakehouse item.
 
-> ![A screenshot of a computer AI-generated content may be
-> incorrect.](./media/image6.png)
+    > ![A screenshot of a computer AI-generated content may be
+    > incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2002/media/image6.png)
 
-5.  Enter **+++AI_Functions+++**as the lakehouse name and
-    select **Create**. When provisioning is complete, the lakehouse
+5.  Enter **+++AI_Functions+++** as the lakehouse name and
+    select **Create**. When provisioning is complete, the lakehouse
     explorer page is shown.
 
-> ![A screenshot of a computer AI-generated content may be
-> incorrect.](./media/image7.png)
->
-> ![A screenshot of a computer AI-generated content may be
-> incorrect.](./media/image8.png)
+    > ![A screenshot of a computer AI-generated content may be
+    > incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2002/media/image7.png)
+
+    > ![A screenshot of a computer AI-generated content may be
+    > incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2002/media/image8.png)
 
 ### Task 3: Create a Notebook and Install the AI Functions Library
 
@@ -95,17 +89,18 @@ and bugfixes, you can run the following code to install and import the
 most up-to-date packages. Afterward, you can use AI functions with
 pandas or PySpark, depending on your preference.
 
-1.  On the **Home** page, select **Open notebook** menu and select **New
+1.  On the **Home** page, select **Open notebook** menu and select **New
     notebook**.
 
-> ![A screenshot of a computer AI-generated content may be
-> incorrect.](./media/image9.png)
->
-> ![A screenshot of a computer AI-generated content may be
-> incorrect.](./media/image10.png)
+    > ![A screenshot of a computer AI-generated content may be
+    > incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2002/media/image9.png)
 
-2.   Replace all the code in the **cell** with the following code and
-    click on **▷ Run cell** button and review the output.
+    > ![A screenshot of a computer AI-generated content may be
+    > incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2002/media/image10.png)
+
+2.   Replace all the code in the **cell** with the following code and
+    click on **▷ Run cell** button and review the output.
+	
     ```
     # Install fixed version of packages
     %pip install -q --force-reinstall openai==1.30 httpx==0.27.0
@@ -117,27 +112,28 @@ pandas or PySpark, depending on your preference.
     %pip install -q --force-reinstall https://mmlspark.blob.core.windows.net/pip/1.0.11.1-spark3.5/synapseml_internal-1.0.11.1.dev1-py2.py3-none-any.whl
     ```
 
-> ![A screenshot of a computer AI-generated content may be
-> incorrect.](./media/image11.png)
->
-> ![A screenshot of a computer code AI-generated content may be
-> incorrect.](./media/image12.png)
->
-> **Note:** It can happen that the notebook will throw some errors in
-> cell 1. These errors are caused by libaries that already have been
-> installed in the environment. You can safely ignore these errors. The
-> notebook will execute successfully regardless of these errors.
->
-> ![](./media/image13.png)
+    > ![A screenshot of a computer AI-generated content may be
+    > incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2002/media/image11.png)
 
-3.  Use the **+ Code** icon below the cell output to add a new code cell
-    to the notebook, and enter the following code in it. Click on **▷
-    Run cell** button and review the output
+    > ![A screenshot of a computer code AI-generated content may be
+    > incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2002/media/image12.png)
 
-4.  This code cell imports the AI functions library and its
+	>[!note]**Note:** It can happen that the notebook will throw some errors in
+	> cell 1. These errors are caused by libaries that already have been
+	> installed in the environment. You can safely ignore these errors. The
+	> notebook will execute successfully regardless of these errors.
+
+    > ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2002/media/image13.png)
+
+3.  Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷
+    Run cell** button and review the output
+
+    >[!note]This code cell imports the AI functions library and its
     dependencies. The pandas cell also imports an optional Python
     library to display progress bars that track the status of every AI
     function call.
+	
     ```
     # Required imports
     import synapse.ml.aifunc as aifunc
@@ -148,27 +144,28 @@ pandas or PySpark, depending on your preference.
     from tqdm.auto import tqdm
     tqdm.pandas()
     ```
-> ![](./media/image14.png)
->
-> ![A screenshot of a computer AI-generated content may be
-> incorrect.](./media/image15.png)
+	
+    > ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2002/media/image14.png)
+    
+    > ![A screenshot of a computer AI-generated content may be
+    > incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2002/media/image15.png)
 
 ## Exercise 2: Applying AI functions
 
-### Task 1: Calculate similarity with ai.similarity
+### Task 1: Calculate similarity with ai.similarity
 
-The ai.similarity function invokes AI to compare input text values with
+The ai.similarity function invokes AI to compare input text values with
 a single common text value, or with pairwise text values in another
 column. The output similarity scores are relative, and they can range
-from **-1** (opposites) to **1** (identical). A score of **0** indicates
+from **-1** (opposites) to **1** (identical). A score of **0** indicates
 that the values are completely unrelated in meaning.
 
-1.  Use the **+ Code** icon below the cell output to add a new code cell
-    to the notebook, and enter the following code in it. Click on **▷
-    Run cell** button and review the output
+1.  Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷
+    Run cell** button and review the output
 
-   > PythonCopy
-    ```
+   
+    ```PythonCopy
     # This code uses AI. Always review output for mistakes. 
     # Read terms: https://azure.microsoft.com/support/legal/preview-supplemental-terms/
     df = pd.DataFrame([ 
@@ -180,24 +177,23 @@ that the values are completely unrelated in meaning.
     df["similarity"] = df["names"].ai.similarity(df["companies"])
     display(df)
     ```
-> ![A screenshot of a computer code AI-generated content may be
-> incorrect.](./media/image16.png)
->
-> ![A screenshot of a computer AI-generated content may be
-> incorrect.](./media/image17.png)
+	
+    > ![A screenshot of a computer code AI-generated content may be
+    > incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2002/media/image16.png)
 
-### Task 2: Categorize text with ai.classify
+    > ![A screenshot of a computer AI-generated content may be
+    > incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2002/media/image17.png)
 
-The ai.classify function invokes AI to categorize input text according
+### Task 2: Categorize text with ai.classify
+
+The ai.classify function invokes AI to categorize input text according
 to custom labels
 
-1.  Use the **+ Code** icon below the cell output to add a new code cell
-    to the notebook, and enter the following code in it. Click on **▷
-    Run cell** button and review the output
+1.  Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷
+    Run cell** button and review the output
 
-   > PythonCopy
-
-    ```
+    ```PythonCopy
     # This code uses AI. Always review output for mistakes. 
     # Read terms: https://azure.microsoft.com/support/legal/preview-supplemental-terms/
     
@@ -211,18 +207,17 @@ to custom labels
     display(df)
     ```
 
-![](./media/image18.png)
+	> ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2002/media/image18.png)
 
-### Task 3: Detect sentiment with ai.analyze_sentiment
+### Task 3: Detect sentiment with ai.analyze_sentiment
 
-The ai.analyze_sentiment function invokes AI to identify whether the
+The ai.analyze_sentiment function invokes AI to identify whether the
 emotional state expressed by input text is positive, negative, mixed, or
 neutral. If AI can't make this determination, the output is left blank.
 
-1.  Use the **+ Code** icon below the cell output to add a new code cell
-    to the notebook, and enter the following code in it. Click on **▷
-    Run cell** button and review the output
-
+1.  Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷
+    Run cell** button and review the output
 
     ```
     # This code uses AI. Always review output for mistakes. 
@@ -239,17 +234,17 @@ neutral. If AI can't make this determination, the output is left blank.
     display(df)
     ```
  
-> ![](./media/image19.png)
+    > ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2002/media/image19.png)
 
-### Task 4: Extract entities with ai.extract
+### Task 4: Extract entities with ai.extract
 
-The ai.extract function invokes AI to scan input text and extract
-specific types of information designated by labels you choose—for
+The ai.extract function invokes AI to scan input text and extract
+specific types of information designated by labels you choose-for
 example, locations or names.
 
-1.  Use the **+ Code** icon below the cell output to add a new code cell
-    to the notebook, and enter the following code in it. Click on **▷
-    Run cell** button and review the output
+1.  Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷
+    Run cell** button and review the output
 
     ```
     # This code uses AI. Always review output for mistakes. 
@@ -263,16 +258,18 @@ example, locations or names.
     df_entities = df["descriptions"].ai.extract("name", "profession", "city")
     display(df_entities)
     ```
-> ![](./media/image20.png)
+	
+    > ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2002/media/image20.png)
 
-### Task 5: Fix grammar with ai.fix_grammar
+### Task 5: Fix grammar with ai.fix_grammar
 
-The ai.fix_grammar function invokes AI to correct the spelling, grammar,
+The ai.fix_grammar function invokes AI to correct the spelling, grammar,
 and punctuation of input text.
 
-1.  Use the **+ Code** icon below the cell output to add a new code cell
-    to the notebook, and enter the following code in it. Click on **▷
-    Run cell** button and review the output
+1.  Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷
+    Run cell** button and review the output.
+	
     ```
     # This code uses AI. Always review output for mistakes. 
     # Read terms: https://azure.microsoft.com/support/legal/preview-supplemental-terms/
@@ -286,15 +283,17 @@ and punctuation of input text.
     df["corrections"] = df["text"].ai.fix_grammar()
     display(df)
     ```
-> ![](./media/image21.png)
+	
+    > ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2002/media/image21.png)
 
-### Task 6: Summarize text with ai.summarize
+### Task 6: Summarize text with ai.summarize
 
-The ai.summarize function invokes AI to generate summaries of input text
+The ai.summarize function invokes AI to generate summaries of input text
 (either values from a single column of a DataFrame, or row values across
 all the columns).
-1.  Use the **+ Code** icon below the cell output to add a new code cell
-    to the notebook, and enter the following code in it. Click on **▷ Run cell** button and review the output
+1.  Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷ Run cell** button and review the output.
+	
     ```
     # This code uses AI. Always review output for mistakes. 
     # Read terms: https://azure.microsoft.com/support/legal/preview-supplemental-terms/
@@ -302,7 +301,7 @@ all the columns).
     df= pd.DataFrame([
             ("Microsoft Teams", "2017",
             """
-            The ultimate messaging app for your organization—a workspace for real-time 
+            The ultimate messaging app for your organization-a workspace for real-time 
             collaboration and communication, meetings, file and app sharing, and even the 
             occasional emoji! All in one place, all in the open, all accessible to everyone.
             """),
@@ -317,20 +316,22 @@ all the columns).
     df["summaries"] = df["description"].ai.summarize()
     display(df)
     ```
-![A screenshot of a computer AI-generated content may be
-incorrect.](./media/image22.png)
+	
+	> ![A screenshot of a computer AI-generated content may be
+	incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2002/media/image22.png)
 
-![A screenshot of a computer AI-generated content may be
-incorrect.](./media/image23.png)
+	> ![A screenshot of a computer AI-generated content may be
+	incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2002/media/image23.png)
 
-### Task 7: Translate text with ai.translate
+### Task 7: Translate text with ai.translate
 
-The ai.translate function invokes AI to translate input text to a new
+The ai.translate function invokes AI to translate input text to a new
 language of your choice.
 
-1.  Use the **+ Code** icon below the cell output to add a new code cell
-    to the notebook, and enter the following code in it. Click on **▷
-    Run cell** button and review the output
+1.  Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷
+    Run cell** button and review the output.
+	
     ```
     # This code uses AI. Always review output for mistakes. 
     # Read terms: https://azure.microsoft.com/support/legal/preview-supplemental-terms/
@@ -344,16 +345,18 @@ language of your choice.
     df["translations"] = df["text"].ai.translate("spanish")
     display(df)
     ```
-> ![](./media/image24.png)
+	
+    > ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2002/media/image24.png)
 
-### Task 8: Answer custom user prompts with ai.generate_response
+### Task 8: Answer custom user prompts with ai.generate_response
 
-The **ai.generate**\_response function invokes AI to generate custom
+The **ai.generate**\_response function invokes AI to generate custom
 text based on your own instructions.
 
-1.  Use the **+ Code** icon below the cell output to add a new code cell
-    to the notebook, and enter the following code in it. Click on **▷
-    Run cell** button and review the output
+1.  Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷
+    Run cell** button and review the output.
+	
     ```
     # This code uses AI. Always review output for mistakes. 
     # Read terms: https://azure.microsoft.com/support/legal/preview-supplemental-terms/
@@ -368,51 +371,50 @@ text based on your own instructions.
     display(df)
     ```
 
-![A screenshot of a computer AI-generated content may be
-incorrect.](./media/image25.png)
+	> ![A screenshot of a computer AI-generated content may be
+	incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2002/media/image25.png)
 
-![A screenshot of a computer AI-generated content may be
-incorrect.](./media/image26.png)
+	> ![A screenshot of a computer AI-generated content may be
+	incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2002/media/image26.png)
 
 ### Task 9: Clean up resources
 
-1.  Now, click on **AI-FunctionsXXXX** on the left-sided navigation
+1.  Now, click on **AI-Functions@lab.LabInstance.Id** on the left-sided navigation
     pane.
 
-> ![A screenshot of a computer AI-generated content may be
-> incorrect.](./media/image27.png)
+    > ![A screenshot of a computer AI-generated content may be
+    > incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2002/media/image27.png)
 
-2.  Select the **...** option under the workspace name and
-    select **Workspace settings**.
+2.  At the top-right of the Fabric Workspace page select **Workspace settings**. If you do not see this option Select the **...** option at the top right of the page and
+    then select **Workspace settings**.
 
-> ![A screenshot of a computer AI-generated content may be
-> incorrect.](./media/image28.png)
+    > ![A screenshot of a computer AI-generated content may be
+    > incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2002/media/image28.png)
 
-3.  Select **Other** and **Remove this workspace.**
+3.  Select **General** from the left menu, navigate to the bottom of the panel and select **Remove this workspace**.
 
-> ![A screenshot of a computer AI-generated content may be
-> incorrect.](./media/image29.png)
+    > ![A screenshot of a computer AI-generated content may be
+    > incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2002/media/image29.png)
 
-4.  Click on **Delete** in the warning that pops up.
+4.  Click on **Delete** in the warning that pops up.
 
-> ![A screenshot of a computer AI-generated content may be
-> incorrect.](./media/image30.png)
->
-> ![A screenshot of a computer AI-generated content may be
-> incorrect.](./media/image31.png)
->
-> **Summary**
->
-> In this lab, you explored Microsoft Fabric's built-in AI functions
-> that allow seamless integration of powerful language models into data
-> workflows. Using both pandas and Spark DataFrames, you applied
-> functions such as similarity scoring, classification, sentiment
-> analysis, grammar correction, summarization, translation, entity
-> extraction, and response generation—all with minimal code. You also
-> learned how to customize these functions using configuration settings
-> to control model behavior, such as temperature and concurrency.
-> Finally, the lab demonstrated how to connect to a custom Azure OpenAI
-> endpoint, offering flexibility for enterprise deployments. Overall,
-> this lab showcased how Microsoft Fabric simplifies the use of
-> generative AI for data scientists and analysts, enabling smarter and
-> faster data transformation and analysis.
+    > ![A screenshot of a computer AI-generated content may be
+    > incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2002/media/image30.png)
+
+    > ![A screenshot of a computer AI-generated content may be
+    > incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2002/media/image31.png)
+
+**Summary**
+In this lab, you explored Microsoft Fabric's built-in AI functions
+that allow seamless integration of powerful language models into data
+workflows. Using both pandas and Spark DataFrames, you applied
+functions such as similarity scoring, classification, sentiment
+analysis, grammar correction, summarization, translation, entity
+extraction, and response generation-all with minimal code. You also
+learned how to customize these functions using configuration settings
+to control model behavior, such as temperature and concurrency.
+Finally, the lab demonstrated how to connect to a custom Azure OpenAI
+endpoint, offering flexibility for enterprise deployments. Overall,
+this lab showcased how Microsoft Fabric simplifies the use of
+generative AI for data scientists and analysts, enabling smarter and
+faster data transformation and analysis.
