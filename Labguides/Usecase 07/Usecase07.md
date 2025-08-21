@@ -565,7 +565,7 @@ save the notebook with a meaningful name and end the Spark session.
 4.  On the notebook menu, select the **Stop session** icon to end the Spark
     session.
 
-    >!IMAGE[stop_session.png](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2007/media/stop_session.png)
+    >![stop_session.png](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2007/media/stop_session.png)
 
 ### Task 11: Clean up resources
 
@@ -615,4 +615,3 @@ comparing model accuracy. The best performing model was saved for future
 use, and the notebook was appropriately named and saved. Finally, you've
 completed the lab by cleaning up resources and deleting the workspace
 created for the exercise.
-
