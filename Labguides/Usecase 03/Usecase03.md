@@ -1355,7 +1355,7 @@ transform, and load* (ETL) process.
 
     - **Connection**: Create new connection
   
-    - **Connection name**:Any name
+    - **Connection name**:orders1
     
     - **data gateway**: (none)
     
@@ -1579,3 +1579,4 @@ streamlining your workflow and enhancing productivity in real-world
 scenarios. The cleanup instructions ensure you leave no unnecessary
 resources, promoting an organized and efficient workspace management
 approach.
+
