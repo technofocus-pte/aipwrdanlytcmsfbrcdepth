@@ -252,7 +252,7 @@ The following code reads raw data from the **Files** section of the
 lakehouse, and adds more columns for different date parts. Creation
 of the partitioned delta table uses this information.
 
-1.  Use the **+ Code** icon below the cell output to add a new code cell
+2.  Use the **+ Code** icon below the cell output to add a new code cell
     to the notebook, and enter the following code in it. Click on **▷
     Run cell** button and review the output
 	
@@ -616,28 +616,6 @@ installation, ensure this cell is run before executing any others.
     from lightgbm import LGBMClassifier
     from sklearn.ensemble import RandomForestClassifier
     from sklearn.metrics import accuracy_score, f1_score, precision_score, confusion_matrix, recall_score, roc_auc_score, classification_report
-
-    y = df_clean["Exited"]
-	X = df_clean.drop("Exited",axis=1)
-  
-	from collections import Counter
-	from imblearn.over_sampling import SMOTE
-
-    # SMOTE (and most machine learning models) expects numerical input, but your dataset contains categorical string values like 'France'
-    # need to convert categorical string columns to numeric format before applying SMOTE
-
-    #Identify categorical columns
-	categorical_cols = X.select_dtypes(include=['object']).columns
-	print(categorical_cols)
-	  
-	#Apply encoding - SMOTE, label encoding is simpler and works well
-	from sklearn.preprocessing import LabelEncoder
-	  
-	label_encoders = {}
-	for col in categorical_cols:
-	    le = LabelEncoder()
-	    X[col] = le.fit_transform(X[col])
-	    label_encoders[col] = le
     ```
 	
     > ![A screenshot of a computer AI-generated content
@@ -776,7 +754,7 @@ installation, ensure this cell is run before executing any others.
 
 ### Task 9: Assess the performances of the trained models on the validation dataset
 
-1.  Select **Sample-bank-churn-experiment** in the left navigation pane.
+1.  Select **Notebook1** in the left navigation pane.
 
     > ![A screenshot of a computer AI-generated content may be
     > incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2008/media/image69.png)
@@ -1239,4 +1217,3 @@ the workspace you created for this tutorial.
 
 	> ![A screenshot of a computer Description automatically
 	generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2008/media/image118.png)
-
