@@ -491,8 +491,7 @@ aims to increase individual file size of the written data.
     ```
 > ![](./media/image22.png)
 >
-> ![A screenshot of a computer AI-generated content may be
-> incorrect.](./media/image23.png)
+
 >
 > When running a cell, you didn't have to specify the underlying Spark
 > pool or cluster details because Fabric provides them through Live
@@ -1018,3 +1017,4 @@ The lab also covers tasks related to ingesting sample data, optimizing
 delta tables, and building reports in Power BI for effective data
 analysis. The objectives aim to provide hands-on experience in utilizing
 Microsoft Fabric and Power BI for data management and reporting purpo
+
