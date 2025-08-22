@@ -98,8 +98,9 @@ reports.
     |    |   |
     |----|----|
     |Name	|+++AI-Fabric-@lab.LabInstance.Id+++ (This must be a unique value) |
-    |Advanced	|Under License mode, select Fabric capacity|
-    |Default storage format	|Small dataset storage format|
+    |Advanced	|Under License mode, select **Fabric capacity** |
+    |Semantic model storage format | **Small semantic model storage format** |
+    | Capacity | **fabriccapacity@lab.LabInstance.Id - [Location]** |
 
     > ![A screenshot of a computer AI-generated content may be
     > incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2010/media/image11.png)
@@ -107,7 +108,7 @@ reports.
     > ![A screenshot of a computer AI-generated content may be
     > incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2010/media/image12.png)
 
-7.  Wait for the deployment to complete. It takes 2-3 minutes to
+8.  Wait for the deployment to complete. It takes 2-3 minutes to
     complete.
 
     > ![A screenshot of a computer AI-generated content may be
@@ -115,8 +116,8 @@ reports.
 
 ### Task 2: Create a lakehouse
 
-1.  In the **Fabric** **Home** page, select **+New item** and
-    select **Lakehouse** tile.
+1.  In the **Fabric** **Home** page, select **+New item**, filter by, and
+    select the **+++Lakehouse+++** tile.
 
     > ![A screenshot of a computer AI-generated content may be
     > incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2010/media/image14.png)
@@ -424,7 +425,7 @@ determine whether or not the AI skill has a published URL value.
     to the notebook, enter the following code in it and replace the
     **URL**. Click on **▷ Run** button and review the output
 
-	+++%pip install "openai==1.70.0"+++
+	> +++%pip install "openai==1.70.0"+++
 
     > ![A screenshot of a computer AI-generated content may be
     > incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2010/media/image56.png)
@@ -573,3 +574,4 @@ programmatically from a Fabric notebook, demonstrating end-to-end AI
 integration. This lab empowers you to make enterprise data more
 accessible, usable, and intelligent for business users through natural
 language and generative AI technologies.
+
