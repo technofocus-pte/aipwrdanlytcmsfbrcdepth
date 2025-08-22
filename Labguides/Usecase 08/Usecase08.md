@@ -78,8 +78,8 @@ Before working with data in Fabric, create a workspace.
     |   |   |
     |----|---|
     |Name	| +++Data-Science@lab.LabInstance.Id+++ (This must be a unique value) |
-    |Advanced|	Under License mode, select Fabric capacity|
-    |Default storage format|	Small dataset storage format|
+    |Advanced|	Under License mode, select **Fabric capacity** |
+    |Semantic model storage format|	**Small semantic model storage format** |
 
     > ![A screenshot of a computer AI-generated content may be
     > incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2008/media/image7.png)
@@ -99,8 +99,8 @@ Now that you have a workspace, it's time to switch to the *Data
 engineering* experience in the portal and create a data lakehouse for
 the data files you're going to analyze.
 
-1.  In the Fabric home page, Select **+New item** and filter by and 
-    select **+++Lakehouse+++**
+1.  In the Fabric home page, Select **+New item** and filter by, and 
+    select, **+++Lakehouse+++**
 
 	> ![A screenshot of a computer AI-generated content may be
 	incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2008/media/image10.png)
@@ -1217,3 +1217,4 @@ the workspace you created for this tutorial.
 
 	> ![A screenshot of a computer Description automatically
 	generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2008/media/image118.png)
+
