@@ -55,9 +55,9 @@ To create a multi-service resource follow these instructions:
     |       |        |
     |-----|----|
     |Project details	|Description|
-    |Subscription|	Select the assigned subscription.|
-    |Resource group|	Select the assigned resource group|
-    |Region|	Select the appropriate region for your CognitiveServices. In this lab, we have chosen the East US 2 region.|
+    |Subscription|	**@lab.CloudSubscription.Name** |
+    |Resource group| **@lab.CloudResourceGroup(ResourceGroup1).Name** |
+    |Region|	Select the appropriate region for your CognitiveServices. For this lab select **@lab.CloudResourceGroup(ResourceGroup1).Location**.|
     |Name	|+++Cognitive-service@lab.LabInstance.Id+++ (This should be a unique value)|
     |Pricing tier	|Standard S0|
 
@@ -101,7 +101,7 @@ To create a multi-service resource follow these instructions:
     > ![A screenshot of a computer Description automatically
     > generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2009/media/image7.png)
 
-2.  In the **Create a resource** page search bar, type **Key vault** and
+2.  In the **Create a resource** page search bar, type **+++Key vault+++** and
     click on the appeared **Key vault** .
     > ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2009/media/image8.png)
 
@@ -111,24 +111,25 @@ To create a multi-service resource follow these instructions:
 
 4.  On the **Create a key Vault** page, provide the following
     information and click on **Review+create** button.
+    
     |     |   |
     |-----|---|
     |Field	|Description|
-    |Subscription|	Select the assigned subscription.|
-    |Resource group	|Select your Resource group(that you have created in Task 1)|
-    |Region|	EastUS 2|
-    |Name	|+++fabrickeyvault@lab.LabInstance.Id+++ (This should be a unique value)|
-    |Pricing Tier|	Click on change Price Tire>select Standard |
+    |Subscription|	**@lab.CloudSubscription.Name** |
+    |Resource group	| **@lab.CloudResourceGroup(ResourceGroup1).Name** |
+    |Region| **@lab.CloudResourceGroup(ResourceGroup1).Location** |
+    |Name	| **+++fabrickeyvault@lab.LabInstance.Id+++**  (This should be a unique value)|
+    |Pricing Tier|	**Standard** |
 
 
     > ![A screenshot of a computer AI-generated content may be
     > incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2009/media/image10.png)
 
-5.  Once the Validation is passed, click on the **Create** button.
+6.  Once the Validation is passed, click on the **Create** button.
 
     > ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2009/media/image11.png)
 
-6.  After the deployment is completed, click on the **Go to resource**
+7.  After the deployment is completed, click on the **Go to resource**
     button.
 
     > ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2009/media/image12.png)
@@ -144,7 +145,7 @@ To create a multi-service resource follow these instructions:
     > ![A screenshot of a computer AI-generated content may be
     > incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2009/media/image14.png)
 
-5.  In **Job function roles,** type the **+++Key vault administrator+++** in the search box and select it. Click **Next**
+5.  In **Job function roles,** type **+++Key vault administrator+++** in the search box and select it. Click **Next**
 
     > ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2009/media/image15.png)
 
@@ -223,8 +224,8 @@ To create a multi-service resource follow these instructions:
     > ![A screenshot of a computer Description automatically
     > generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2009/media/image7.png)
 
-    2.  In the **Create a resource** page search bar, type **Azure AI
-    Search** and click on the appeared **azure ai search**.
+    2.  In the **Create a resource** page search bar, type **+++Azure AI
+    Search+++** and click on the appeared **azure ai search**.
 
 	> ![A screenshot of a computer Description automatically
 	generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2009/media/image28.png)
@@ -244,17 +245,18 @@ To create a multi-service resource follow these instructions:
     |   |  |
     |----|----|
     |Field	|Description|
-    |Subscription	|Select the assigned subscription|
-    |Resource group|	Select your Resource group|
-    |Region	|EastUS 2|
+    |Subscription	| **@lab.CloudSubscription.Name** |
+    |Resource group| **@lab.CloudResourceGroup(ResourceGroup1).Name** |
+    |Region	| **@lab.CloudResourceGroup(ResourceGroup1).Location** |
     |Name	|+++mysearchservice@lab.LabInstance.Id+++ (This should be a unique value)|
+    |Location | **@lab.CloudResourceGroup(ResourceGroup1).Location** |
     |Pricing Tier	|Click on change Price Tire>select Basic|
-    
+
     > ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2009/media/image31.png)
     
     > ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2009/media/image32.png)
 
-6.  Once the Validation is passed, click on the **Create** button.
+7.  Once the Validation is passed, click on the **Create** button.
 
 	> ![A screenshot of a computer AI-generated content may be
 	incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2009/media/image33.png)
@@ -312,9 +314,9 @@ reports.
 
     |   |   |
     |----|-----|
-    |Name	|++++Document Intelligence-Fabric@lab.LabInstance.Id+++ (This should be a unique value)|
-    |Advanced|	Select Fabric Capacity|
-    |Capacity	|Select Realtimefabriccapacity-West US 3|
+    |Name	|+++Document Intelligence-Fabric@lab.LabInstance.Id+++ (This should be a unique value)|
+    |Advanced|	**Fabric Capacity**|
+    |Capacity	| **fabriccapacity@lab.LabInstance.Id - [Location]**|
 
     > ![A screenshot of a computer AI-generated content may be
     > incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2009/media/image41.png)
@@ -1003,3 +1005,4 @@ portal](https://portal.azure.com/?azure-portal=true).
 
     > ![A screenshot of a computer Description automatically
     generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2009/media/image80.png)
+
