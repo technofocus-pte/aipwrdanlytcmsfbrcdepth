@@ -113,8 +113,8 @@ Before working with data in Fabric, create a workspace.
     |  |  |
     |---|---|
     |Name	|+++TrainModel_Fabric@lab.LabInstance.Id+++ (This must be a unique value) |
-    |Advanced	|Under License mode, select Fabric capacity|
-    |Default storage format|	Small dataset storage format|
+    |Advanced	|Under License mode, select **Fabric capacity** |
+    |Semantin model storage format|	**Small semantic model storage format** |
 
 
     > ![A screenshot of a computer AI-generated content may be
@@ -136,7 +136,7 @@ science* experience in the portal and create a data lakehouse for the
 data files you're going to analyze.
 
 1.  In the **Fabric** page, navigate to +**New item** section and
-    then filter by and select **+++Lakehouse+++** to create Lakehouse.
+    then filter by, and select, **+++Lakehouse+++** to create Lakehouse.
 
     > ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2007/media/image15.png)
 
@@ -615,3 +615,4 @@ comparing model accuracy. The best performing model was saved for future
 use, and the notebook was appropriately named and saved. Finally, you've
 completed the lab by cleaning up resources and deleting the workspace
 created for the exercise.
+
