@@ -1,4 +1,4 @@
-# Usecase 06- Chat with your data using Fabric Data Agent
+# Usecase 10- Chat with your data using Fabric Data Agent
 
 **Introduction:**
 
@@ -568,3 +568,4 @@ programmatically from a Fabric notebook, demonstrating end-to-end AI
 integration. This lab empowers you to make enterprise data more
 accessible, usable, and intelligent for business users through natural
 language and generative AI technologies.
+
