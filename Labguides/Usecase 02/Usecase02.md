@@ -164,7 +164,6 @@ that the values are completely unrelated in meaning.
     to the notebook, and enter the following code in it. Click on **▷
     Run cell** button and review the output
 
-   
     ```PythonCopy
     # This code uses AI. Always review output for mistakes. 
     # Read terms: https://azure.microsoft.com/support/legal/preview-supplemental-terms/
