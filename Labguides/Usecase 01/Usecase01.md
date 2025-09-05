@@ -252,18 +252,16 @@ reports.
     > ![A screenshot of a computer AI-generated content may be
     > incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2001/media/image31.png)
 
-13. From the lakehouse **Reporting** tab, select **Manage default
-    semantic model** and select the tables that you want to add to the
+12. From the lakehouse **Home** tab, select **New semantic model** and select the tables that you want to add to the
     semantic model.
 
-    > ![A screenshot of a computer AI-generated content may be
-    > incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2001/media/image32.png)
+   ![A screenshot of a computer AI-generated content may be
+incorrect.](./media/c1.png)
 
-14. In **Manage default semantic model** tab, select
-    the **dimension_customer** table and click on **Confirm.**
+13. In the **New semantic model** dialog enter **+++wwilakehouse+++** and then select the **dimension_customer** table from the list of tables and select **Confirm** to create the new model
 
-    > ![A screenshot of a computer AI-generated content may be
-    > incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2001/media/image33.png)
+    ![A screenshot of a computer AI-generated content may be
+incorrect.](./media/c2.png)
 
 ### Task 4: Build a report
 
@@ -1040,3 +1038,4 @@ The lab also covers tasks related to ingesting sample data, optimizing
 delta tables, and building reports in Power BI for effective data
 analysis. The objectives aim to provide hands-on experience in utilizing
 Microsoft Fabric and Power BI for data management and reporting purposes.
+
