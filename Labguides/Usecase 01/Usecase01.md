@@ -275,8 +275,7 @@ then crosscheck the script syntax with the above image.
 1.  Now, click on **Fabric Lakehouse** **Tutorial-XX** on the left-sided
     navigation pane.
 
-> ![A screenshot of a computer AI-generated content may be
-> incorrect.](./media/image34.png)
+   ![](./media/t1.png)
 
 2.  Now, select **wwilakehouse** of type **SQL analytics **
 
@@ -285,8 +284,7 @@ then crosscheck the script syntax with the above image.
 
 3.  From the lakehouse **Home** tab, select **Settings**
 
-> ![A screenshot of a computer AI-generated content may be
-> incorrect.](./media/image36.png)
+   ![](./media/t3.png)
 
 4.  To ensure that the tables in the semantic model are always in sync,
     switch to the **SQL analytics endpoint** view and open the
@@ -307,8 +305,7 @@ then crosscheck the script syntax with the above image.
     dataset is automatically created and has the same name as the
     lakehouse.
 
-> ![A screenshot of a computer AI-generated content may be
-> incorrect.](./media/image38.png)
+    ![](./media/t6.png)
 
 7.  From the semantic model pane, you can view all the tables. You have
     options to create reports either from scratch, paginated report, or
@@ -1018,3 +1015,4 @@ The lab also covers tasks related to ingesting sample data, optimizing
 delta tables, and building reports in Power BI for effective data
 analysis. The objectives aim to provide hands-on experience in utilizing
 Microsoft Fabric and Power BI for data management and reporting purpo
+
