@@ -606,6 +606,8 @@ previous section.
 >
 > ![](./media/image79.png)
 
+9. Run all the cells in the “Path 2 - Lakehouse schemas not enabled (alternate path)” section of the notebook to create the required tables in the Lakehouse.
+
 ## Exercise 4: Transform Data with a Dataflow in Data Factory
 
 ### Task 1: Get Data from the Bronze Lakehouse Table
