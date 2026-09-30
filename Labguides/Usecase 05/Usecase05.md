@@ -1,6 +1,6 @@
 <!--
 lab:
-  title: 'Exercise 1: Create a Microsoft Fabric workspace'
+  title: ' Use Case 05: Implementing a Data Science scenario in Microsoft Fabric'
   description: In this lab, you’ll assume the role of a data engineer at Contoso tasked with designing and implementing a data warehouse solution using Microsoft Fabric. You will start by setting up a Fabric workspace, creating a data warehouse, loading data from Azure Blob Storage, and performing analytical tasks to deliver insights to Contoso's decision-makers.
   duration: 5 minutes
   level: 400
@@ -11,1069 +11,1354 @@ lab:
     - Microsoft Fabric
 -->
 
-# **Use case 05-Building a Sales and Geography Data Warehouse for Contoso in Microsoft Fabric**
+# Use Case 05: Implementing a Data Science scenario in Microsoft Fabric
 
-## Introduction
+**Introduction**
 
-Contoso, a multinational retail company, is looking to modernize its data infrastructure to improve sales and geographical analysis. Currently, their sales and customer data is scattered across multiple systems, making it difficult for their business analysts and citizen developers to derive insights. The company plans to consolidate this data into a unified platform using Microsoft Fabric to enable cross-querying, sales analysis, and geographical reporting.
+The lifecycle of a Data science project typically includes (often,
+iteratively) the following steps:
 
-In this lab, you’ll assume the role of a data engineer at Contoso tasked with designing and implementing a data warehouse solution using Microsoft Fabric. You will start by setting up a Fabric workspace, creating a data warehouse, loading data from Azure Blob Storage, and performing analytical tasks to deliver insights to Contoso's decision-makers.
+- Business understanding
 
-While many concepts in Microsoft Fabric may be familiar to data and analytics professionals, it can be challenging to apply those concepts in a new environment. This lab has been designed to walk step-by-step through an end-to-end scenario from data acquisition to data consumption to build a basic understanding of the Microsoft Fabric user experience, the various experiences and their integration points, and the Microsoft Fabric professional and citizen developer experiences.
+- Data acquisition
 
-### Objectives
+- Data exploration, cleansing, preparation, and visualization
 
-- Set up a Fabric workspace with trial enabled.
-- Establish a new Warehouse named WideWorldImporters in Microsoft
-  Fabric.
+- Model training and experiment tracking
 
-- Load data into the Warehouse_FabricXX workspace using a Data Factory
-  pipeline.
+- Model scoring and generating insights
 
-- Generate dimension_city and fact_sale tables within the data
-  warehouse.
+The goals and success criteria of each stage depend on collaboration,
+data sharing and documentation. The Fabric data science experience
+consists of multiple native-built features that enable collaboration,
+data acquisition, sharing, and consumption in a seamless way.
 
-- Populate dimension_city and fact_sale tables with data from Azure Blob
-  Storage.
+In these tutorials, you take the role of a data scientist who has been
+given the task to explore, clean, and transform a dataset containing the
+churn status of 10000 customers at a bank. You then build a machine
+learning model to predict which bank customers are likely to leave.
 
-- Create clones of dimension_city and fact_sale tables in the Warehouse.
-- Clone dimension_city and fact_sale tables into the dbo1 schema.
-- Develop a stored procedure to transform data and create
-  aggregate_sale_by_date_city table.
+**Objective**
 
-- Generate a query using the visual query builder to merge and aggregate
-  data.
+- Use the Fabric notebooks for data science scenarios.
 
-- Use a notebook to query and analyze data from the dimension_customer
-  table.
+- Ingest data into a Fabric lakehouse using Apache Spark.
 
-- Include WideWorldImporters and ShortcutExercise warehouses for
-  cross-querying.
+- Load existing data from the lakehouse delta tables.
 
-- Execute a T-SQL query across WideWorldImporters and ShortcutExercise
-  warehouses.
+- Clean and transform data using Apache Spark and Python based tools.
 
-- Enable Azure Maps visual integration in the Admin portal.
-- Generate column chart, map, and table visuals for Sales Analysis
-  report.
+- Create experiments and runs to train different machine learning
+  models.
 
-- Create a report using data from the WideWorldImporters dataset in the
-  OneLake data hub.
+- Register and track trained models using MLflow and the Fabric UI.
 
-- Remove the workspace and its associated items.
+- Run scoring at scale and save predictions and inference results to the
+  lakehouse.
 
+- Visualize predictions in Power BI using DirectLake.
 
-## **Exercise 1: Create a Microsoft Fabric workspace**
+## Task 1: Create a workspace
 
-### **Task 1: Sign in to Power BI account and sign up for free [Microsoft Fabric trial](https://learn.microsoft.com/en-us/fabric/get-started/fabric-trial)**
+Before working with data in Fabric, create a workspace.
 
-1. Open your browser, navigate to the address bar, and type or paste the following URL: +++https://app.fabric.microsoft.com/+++ then press the **Enter** button.
+1.  Open your browser, navigate to the address bar, and type or paste
+    the following URL: +++https://app.fabric.microsoft.com/+++ then
+    press the **Enter** button.
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image1.png)
+\[!Note\] If you are directed to Microsoft Fabric Home page, then skip
+steps from \#2 to \#4.
 
-1. In the **Microsoft Fabric** window, enter assigned credentials, and click on the **Submit** button.
+![A screenshot of a computer Description automatically
+generated](./media/image1.png)
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image2.png)
+2.  In the **Microsoft Fabric** window, enter your credentials, and
+    click on the **Submit** button.
 
-1. Then, In the **Microsoft** window enter the password and click on the **Sign in** button**.**
+![A screenshot of a computer error AI-generated content may be
+incorrect.](./media/image2.png)
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image3.png)
+3.  Then, In the **Microsoft** window enter the password and click on
+    the **Sign in** button.
 
-1. In **Stay signed in?** window, click on the **Yes** button.
+![A login box with a red line and blue text AI-generated content may be
+incorrect.](./media/image3.png)
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image4.png)
+4.  In **Stay signed in?** window, click on the **Yes** button.
 
-1. You’ll be directed to Power BI Home page.
+![](./media/image4.png)
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image5.png)
+5.  In the **Fabric** home page, select **+New workspace**.
 
+![](./media/image5.png)
 
-### Task 2: Create a workspace
+6.  In the **Create a workspace tab**, enter the following details and
+    click on the **Apply** button.
 
-Before working with data in Fabric, create a workspace with the Fabric trial enabled.
+| Property | Value |
+| --- | --- |
+| Name | +++Data-Science@lab.LabInstance.Id+++ |
+| Advanced | Under **License mode**, select **Fabric capacity** |
+| Semantic model storage format | **Small semantic model storage format** |
 
-1. In the Workspaces pane Select **+** **New workspace**.
+> ![A screenshot of a computer AI-generated content may be
+> incorrect.](./media/image6.png)
+>
+> ![](./media/image7.png)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image6.png)
+7.  Wait for the deployment to complete. It takes 2-3 minutes to
+    complete. When your new workspace opens, it should be empty.
 
-1. In the **Create a workspace tab, enter** the following details and click on the **Apply** button.
+![](./media/image8.png)
 
-    |  |  |
-    |----|---|
-    |Name	|+++Warehouse_Fabric@lab.LabInstance.Id+++ |
-    |Description	|+++This workspace contains all the artifacts for the data warehouse+++|
-    |Advanced	Under License mode| select Fabric capacity|
-    |Default storage format	|Small dataset storage format|
+## Task 2: Create a lakehouse
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image7.png)
+Now that you have a workspace, it's time to switch to the *Data
+engineering* experience in the portal and create a data lakehouse for
+the data files you're going to analyze.
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image8.png)
+1.  In the Fabric home page, Select **+New item** and filter by, and
+    select, +++Lakehouse+++
 
-1. Wait for the deployment to complete. It takes 1-2 minutes to complete. When your new workspace opens, it should be empty.
+![](./media/image9.png)
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image9.png)
+2.  In the **New lakehouse** dialog box, enter
+    +++**FabricData_Sciencelakehouse**+++ in the **Name** field, click
+    on the **Create** button and open the new lakehouse.
 
+![](./media/image10.png)
 
-### Task 3: Create a Warehouse in Microsoft Fabric
+\[!Note\] After a minute or so, a new empty lakehouse will be created.
+You need to ingest some data into the data lakehouse for analysis.
 
-1. In the **Fabric** page, select **+ New item** to create a lakehouse and select **Warehouse**
+![](./media/image11.png)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image10.png)
+\[!Note\] You will see a notification stating **Successfully created SQL
+endpoint**.
 
-1. On the **New warehouse** dialog, enter +++WideWorldImporters+++ and click on the **Create** button.
+![A screenshot of a computer Description automatically
+generated](./media/image12.png)
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image11.png)
+## Task 3: Install custom libraries and load the data
 
-1. When provisioning is complete, the **WideWorldImporters** warehouse landing page appears.
+**Bank churn data**
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image12.png)
+The dataset contains churn status of 10,000 customers. It also includes
+attributes that could impact churn such as:
 
+- Credit score
 
-## **Exercise 2: Ingest data into a Warehouse in Microsoft Fabric**
+- Geographical location (Germany, France, Spain)
 
-### Task 1: Ingest data into a Warehouse
+- Gender (male, female)
 
-1. From the **WideWorldImporters** warehouse landing page, select **Warehouse_FabricXX** in the left-sided navigation menu to return to the workspace item list.
+- Age
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image13.png)
+- Tenure (years of being bank's customer)
 
-1. In the **Warehouse_FabricXX** page, select +**New item**. Then, click **Pipeline** to view the full list of available items under Get data.
+- Account balance
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image14.png)
+- Estimated salary
 
-1. On the **New** **pipeline** dialog box, in the **Name** field, enter +++Load Customer Data+++ and click on the **Create** button.
+- Number of products that a customer has purchased through the bank
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image15.png)
+- Credit card status (whether a customer has a credit card or not)
 
-1. In the **Load Customer Data** page, navigate to **Start building your data pipeline** section and click on **Pipeline activity**.
+- Active member status (whether an active bank's customer or not)
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image16.png)
+The dataset also includes columns such as row number, customer ID, and
+customer surname that should have no impact on customer's decision to
+leave the bank.
 
-1. Navigate and select **Copy data** under **Move &** **transform** section.
+The event that defines the customer's churn is the closing of the
+customer's bank account. The column exited in the dataset refers to
+customer's abandonment. There isn't much context available about these
+attributes so you have to proceed without having background information
+about the dataset. The aim is to understand how these attributes
+contribute to the exited status.
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image17.png)
+1.  From the toolbar, select the **Analyze data** **with** drop-down
+    menu, point to **Notebook**, and then select **New notebook**.
 
-1. Select the newly created **Copy data** **1** activity from the design canvas to configure it.
+![](./media/image13.png)
 
-    >[!Note] Drag the horizonal line in the design canvas to have a complete view of various features.
+![](./media/image14.png)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image18.png)
+2.  Enter the following code. This code use %pip install to install the
+    imblearn library and then stores it in a Fabric lakehouse. Select
+    the code cell and click on the **play** button to execute cell.
 
-1. On the **General** tab, in the **Name** field**,** enter +++**CD Load dimension_customer+++**
+```
+# Use pip to install libraries
+%pip install imblearn
+```
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image19.png)
+![](./media/image15.png)
 
-1. On the **Source** page, select the **Connection** dropdown. Select **Browse all** to see all of the data sources you can choose from.
+\[!Note\] The PySpark kernel restarts after %pip install runs. Install
+the needed libraries before you run any other cells.
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image20.png)
+\[!Alert\] If you encounter an error in this step indicating an
+incompatibility with the *filelock* version follow these steps to
+correct it before continuing with this task:
 
-1. On the **Get data** window, search +++Azure Blobs+++ in, then click on the **Azure Blob Storage** button.
+- Select the **+ Code** icon below the latest cell output
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image21.png)
+- Enter the code:  
+  %pip install imbalanced-learn filelock\<3.12
 
-1. On the **Connection settings** pane that appears on the right side, configure the following settings and click on the **Connect** button.
+- Select the **▷ Run cell** icon to execute the code
 
-    - In the **Account name or URL**, enter
-    +++https://fabrictutorialdata.blob.core.windows.net/sampledata/+++
+3.  In your notebook, use the **+ Code** icon below the latest cell
+    output to add a new code cell to the notebook.
 
-    - In the **Connection credentials** section, click on the dropdown under
-    **Connection**, then select **Create new connection**.
+4.  Select the code cell and click on the **play** button to execute
+    cell.
 
-    - In **Connection name** field+++,+++ enter +++**Wide World Importers
-    Public Sample+++**.
+```
+IS_CUSTOM_DATA = False  # If TRUE, the dataset has to be uploaded manually
 
-    - Set the **Authentication kind** to **Anonymous**.
+IS_SAMPLE = False  # If TRUE, use only SAMPLE_ROWS of data for training; otherwise, use all data
+SAMPLE_ROWS = 5000  # If IS_SAMPLE is True, use only this number of rows for training
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image22.png)
+DATA_ROOT = "/lakehouse/default"
+DATA_FOLDER = "Files/churn"  # Folder with data files
+DATA_FILE = "churn.csv"  # Data file name
+```
 
+![](./media/image16.png)
 
-1. Change the remaining settings on the **Source** page of the copy activity as follows to reach the .parquet files in **https://fabrictutorialdata.blob.core.windows.net/sampledata/WideWorldImportersDW/parquet/full/dimension_customer/\*.parquet**
+5.  In your notebook, use the **+ Code** icon below the latest cell
+    output to add a new code cell to the notebook. Then enter the
+    following code.This code downloads a publicly available version of
+    the dataset and then stores it in a Fabric lakehouse. Select the
+    code cell and click on the **play** button to execute cell.
 
-1. In the **File path** text boxes, provide:
+```
+import os, requests
+if not IS_CUSTOM_DATA:
+# With an Azure Synapse Analytics blob, this can be done in one line
 
-    - **Container:** +++sampledata+++
-    - **File path - Directory:** +++WideWorldImportersDW/tables+++
-    - **File path - File name:** +++dimension_customer.parquet+++
-    - In the **File format** drop down, choose **Parquet** (if you are
-    unable to see **Parquet**, then type in the search box and then select it)
+# Download demo data files into the lakehouse if they don't exist
+    remote_url = "https://synapseaisolutionsa.z13.web.core.windows.net/data/bankcustomerchurn"
+    file_list = ["churn.csv"]
+    download_path = "/lakehouse/default/Files/churn/raw"
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image23.png)
+    if not os.path.exists("/lakehouse/default"):
+        raise FileNotFoundError(
+            "Default lakehouse not found, please add a lakehouse and restart the session."
+        )
+    os.makedirs(download_path, exist_ok=True)
+    for fname in file_list:
+        if not os.path.exists(f"{download_path}/{fname}"):
+            r = requests.get(f"{remote_url}/{fname}", timeout=30)
+            with open(f"{download_path}/{fname}", "wb") as f:
+                f.write(r.content)
+    print("Downloaded demo data files into lakehouse.")
+```
 
+![](./media/image17.png)
 
-1. Click on **Preview data** on the right side of **File path** setting to ensure that there are no errors and then click on **close.**
+6.  Start recording the time needed to run the notebook. Use the **+
+    Code** icon below the cell output to add a new code cell to the
+    notebook, and enter the following code in it. Click on **▷ Run
+    cell** button and review the output
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image24.png)
+```
+# Record the notebook running time
+import time
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image25.png)
+ts = time.time()
+```
 
-1. On the **Destination** tab, enter the following settings.
+![](./media/image18.png)
 
-    |  |  |
-    |---|---|
-    |Connection	|WideWorldImporters|
-    |Table option	|select the Auto create table radio button.|
-    |Table	|•	In the first box enter +++dbo+++<br>•	In the second box enter +++dimension_customer+++|
+## Task 4: Explore and visualize data using Microsoft Fabric notebooks
 
-    >[!Note] While adding the connect as WideWorldImporters warehouse, add it from the OneLake catalog by navigation to browse all option.
+The following code reads raw data from the **Files** section of the
+lakehouse, and adds more columns for different date parts. Creation of
+the partitioned delta table uses this information.
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image26.png)
+1.  Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷
+    Run cell** button and review the output
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image27.png)
+```
+df = (
+    spark.read.option("header", True)
+    .option("inferSchema", True)
+    .csv("Files/churn/raw/churn.csv")
+    .cache()
+)
+```
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image28.png)
+![](./media/image19.png)
 
-1. From the ribbon, select **Run**.
+\[!Note\] You now need to convert the spark DataFrame to pandas
+DataFrame for easier processing and visualization.
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image29.png)
+2.  Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷
+    Run cell** button and review the output
 
-1. In the **Save and run?** dialog box, click on **Save and run** button.
++++df = df.toPandas()+++
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image30.png)
+![](./media/image20.png)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image31.png)
+\[!Knowledge\] Explore the raw data with display, do some basic
+statistics and show chart views. You first need to import required
+libraries for data visualization such as seaborn, which is a Python data
+visualization library to provide a high-level interface for building
+visuals on DataFrames and arrays.
 
-1. Monitor the copy activity's progress on the **Output** page and wait for it to complete.
+3.  Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷
+    Run cell** button and review the output
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image32.png)
+```
+import seaborn as sns
+sns.set_theme(style="whitegrid", palette="tab10", rc = {'figure.figsize':(9,6)})
+import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
+from matplotlib import rc, rcParams
+import numpy as np
+import pandas as pd
+import itertools
+```
 
+![](./media/image21.png)
 
-## Exercise 3: Create tables in a Data Warehouse
+4.  Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷
+    Run cell** button and review the output
 
-### Task 1: Create table in a Data Warehouse
++++display(df, summary=True)+++
 
-1. On **Load Customer Data** page, click on **Warehouse_FabricXX** workspace in the left-sided navigation bar and select **WideWorldImporters** Warehouse.
+![](./media/image22.png)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image33.png)
+5.  Use Data Wrangler to perform initial data cleansing, under the
+    notebook ribbon select **AI tools** tab, dropdown the **Data
+    Wrangler** and select the **df** data wrangler.
 
-1. On the **WideWorldImporters** page, go to the **Home **tab, select **SQL** from the drop down, and click on **New SQL query**.
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image23.png)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image34.png)
+\[!Note\] Once the Data Wrangler is launched, a descriptive overview of
+the displayed data panel is generated.
 
-1. In the query editor, paste the following code and select **Run** to execute the query
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image24.png)
 
-    ```
-    /*
-    1. Drop the dimension_city table if it already exists.
-    2. Create the dimension_city table.
-    3. Drop the fact_sale table if it already exists.
-    4. Create the fact_sale table.
-    */
-    
-    --dimension_city
-    DROP TABLE IF EXISTS [dbo].[dimension_city];
-    CREATE TABLE [dbo].[dimension_city]
-        (
-            [CityKey] [int] NULL,
-            [WWICityID] [int] NULL,
-            [City] [varchar](8000) NULL,
-            [StateProvince] [varchar](8000) NULL,
-            [Country] [varchar](8000) NULL,
-            [Continent] [varchar](8000) NULL,
-            [SalesTerritory] [varchar](8000) NULL,
-            [Region] [varchar](8000) NULL,
-            [Subregion] [varchar](8000) NULL,
-            [Location] [varchar](8000) NULL,
-            [LatestRecordedPopulation] [bigint] NULL,
-            [ValidFrom] [datetime2](6) NULL,
-            [ValidTo] [datetime2](6) NULL,
-            [LineageKey] [int] NULL
-        );
-    
-    --fact_sale
-    
-    DROP TABLE IF EXISTS [dbo].[fact_sale];
-    
-    CREATE TABLE [dbo].[fact_sale]
-    
-        (
-            [SaleKey] [bigint] NULL,
-            [CityKey] [int] NULL,
-            [CustomerKey] [int] NULL,
-            [BillToCustomerKey] [int] NULL,
-            [StockItemKey] [int] NULL,
-            [InvoiceDateKey] [datetime2](6) NULL,
-            [DeliveryDateKey] [datetime2](6) NULL,
-            [SalespersonKey] [int] NULL,
-            [WWIInvoiceID] [int] NULL,
-            [Description] [varchar](8000) NULL,
-            [Package] [varchar](8000) NULL,
-            [Quantity] [int] NULL,
-            [UnitPrice] [decimal](18, 2) NULL,
-            [TaxRate] [decimal](18, 3) NULL,
-            [TotalExcludingTax] [decimal](29, 2) NULL,
-            [TaxAmount] [decimal](38, 6) NULL,
-            [Profit] [decimal](18, 2) NULL,
-            [TotalIncludingTax] [decimal](38, 6) NULL,
-            [TotalDryItems] [int] NULL,
-            [TotalChillerItems] [int] NULL,
-            [LineageKey] [int] NULL,
-            [Month] [int] NULL,
-            [Year] [int] NULL,
-            [Quarter] [int] NULL
-        );
-    ```
+6.  In df(Data Wrangler) pane, under **Operations** select the **Find
+    and replace \> Drop duplicate rows.**
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image35.png)
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image25.png)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image36.png)
+7.  Under the Target columns, select only
+    the **RowNumber** and **CustomerId** check boxes, and then click on
+    the **Apply** button.
 
-1. To save this query, right-click on the **SQL query 1** tab just above the editor and select **Rename**.
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image26.png)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image37.png)
+8.  In df(Data Wrangler) pane, under **Operations** select the **Find
+    and replace \> Drop missing values.**
 
-1. In the **Rename** dialog box, under **Name** field, enter `Create Tables` to change the name of **SQL query 1**. Then, click on the **Rename** button.
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image27.png)
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image38.png)
+9.  Under the Target columns, choose **Select all** from the **Target
+    columns**, and then click on the **Apply** button.
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image39.png)
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image28.png)
 
-1. Validate the table was created successfully by selecting the **refresh icon** button on the ribbon.
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image29.png)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image40.png)
+10. Expand **Schema** and select **Drop columns**.
 
-1. In the **Explorer** pane, you’ll see the **fact_sale** table and **dimension_city** table.
+![](./media/image30.png)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image41.png)
+11. Select **RowNumber**, **CustomerId**, **Surname**. These columns
+    appear in red in the preview, to show they're changed by the code
+    (in this case, dropped.)
 
+12. Select **Apply** to go on to the next step
 
-### Task 2: Load data using T-SQL
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image31.png)
 
-Now that you know how to build a data warehouse, load a table, and generate a report, it's time to extend the solution by exploring other methods for loading data.
+13. Select **Add code to notebook** at the top left to close Data
+    Wrangler and add the code automatically. The **Add code to
+    notebook** wraps the code in a function, then calls the function.
 
-1. On the **WideWorldImporters** page, go to the **Home** tab, select **SQL** from the dropdown, and click on **New SQL query**.
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image32.png)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image42.png)
+14. Examine the code generated by Data Wrangler
 
-1. In the query editor, **paste** the following code, then click on **Run** to execute the query.
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image33.png)
 
-    ```
-    --Copy data from the public Azure storage account to the dbo.dimension_city table.
-    COPY INTO [dbo].[dimension_city]
-    FROM 'https://fabrictutorialdata.blob.core.windows.net/sampledata/WideWorldImportersDW/tables/dimension_city.parquet'
-    WITH (FILE_TYPE = 'PARQUET');
-    
-    --Copy data from the public Azure storage account to the dbo.fact_sale table.
-    COPY INTO [dbo].[fact_sale]
-    FROM 'https://fabrictutorialdata.blob.core.windows.net/sampledata/WideWorldImportersDW/tables/fact_sale.parquet'
-    WITH (FILE_TYPE = 'PARQUET');
-    ```
+15. Add the argument **inplace=True** to each of the generated steps. By
+    setting inplace=True, pandas will overwrite the original DataFrame
+    instead of producing a new DataFrame as an output. See
+    the **Reference code** for comparison.
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image43.png)
+![A screenshot of a computer program AI-generated content may be
+incorrect.](./media/image34.png)
 
-1. After the query is completed, review the messages, which indicates the number of rows that were loaded into the **dimension_city** and **fact_sale** tables respectively.
+**Reference code:**
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image44.png)
+```
+# Modified version of code generated by Data Wrangler 
+# Modification is to add in-place=True to each step
 
-1. Load the data preview to validate the data loaded successfully by selecting on the **fact_sale** table in the **Explorer**.
+# Define a new function that include all above Data Wrangler operations
+def clean_data(df):
+    # Drop rows with missing data across all columns
+    df.dropna(inplace=True)
+    # Drop duplicate rows in columns: 'RowNumber', 'CustomerId'
+    df.drop_duplicates(subset=['RowNumber', 'CustomerId'], inplace=True)
+    # Drop columns: 'RowNumber', 'CustomerId', 'Surname'
+    df.drop(columns=['RowNumber', 'CustomerId', 'Surname'], inplace=True)
+    return df
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image45.png)
+df_clean = clean_data(df.copy())
+df_clean.head()
+```
+16. Click on **▷ Run cell** button and review the output
 
-1. Rename the query. Right-click on **SQL query 1** in the **Explorer**, then select **Rename**.
+![](./media/image35.png)
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image46.png)
+17. Use this code to determine categorical, numerical, and target
+    attributes. Use the **+ Code** icon below the cell output to add a
+    new code cell to the notebook, and enter the following code in it.
+    Click on **▷ Run cell** button and review the output
 
-1. In the **Rename** dialog box, under the **Name** field, enter +++Load Tables+++. Then, click on **Rename** button.
+```
+# Determine the dependent (target) attribute
+dependent_variable_name = "Exited"
+print(dependent_variable_name)
+# Determine the categorical attributes
+categorical_variables = [col for col in df_clean.columns if col in "O"
+                        or df_clean[col].nunique() <=5
+                        and col not in "Exited"]
+print(categorical_variables)
+# Determine the numerical attributes
+numeric_variables = [col for col in df_clean.columns if df_clean[col].dtype != "object"
+                        and df_clean[col].nunique() >5]
+print(numeric_variables)
+```
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image47.png)
+![](./media/image36.png)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image48.png)
+18. The code below generates box plots to display the five-number
+    summary-minimum, first quartile, median, third quartile, and
+    maximum-for the numerical attributes. Use the **+ Code** icon below
+    the cell output to add a new code cell to the notebook, and enter
+    the following code in it. Click on **▷ Run cell** button and review
+    the output
 
-1. Click on the **Refresh** icon in the command bar below the **Home** tab.
+```
+df_num_cols = df_clean[numeric_variables]
+sns.set(font_scale = 0.7) 
+fig, axes = plt.subplots(nrows = 2, ncols = 3, gridspec_kw =  dict(hspace=0.3), figsize = (17,8))
+fig.tight_layout()
+for ax,col in zip(axes.flatten(), df_num_cols.columns):
+    sns.boxplot(x = df_num_cols[col], color='green', ax = ax)
+# fig.suptitle('visualize and compare the distribution and central tendency of numerical attributes', color = 'k', fontsize = 12)
+fig.delaxes(axes[1,2])
+```
+![](./media/image37.png)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image49.png)
+![A screenshot of a computer screen AI-generated content may be
+incorrect.](./media/image38.png)
 
+19. Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷
+    Run cell** button and review the output showing the distribution of
+    exited versus nonexited customers across the categorical attributes.
 
-## Exercise 4: Clone a table using T-SQL in Microsoft Fabric
+```
+attr_list = ['Geography', 'Gender', 'HasCrCard', 'IsActiveMember', 'NumOfProducts', 'Tenure']
+df_clean['Exited'] = df_clean['Exited'].astype(str)
+fig, axarr = plt.subplots(2, 3, figsize=(15, 4))
+for ind, item in enumerate (attr_list):
+    sns.countplot(x = item, hue = 'Exited', data = df_clean, ax = axarr[ind%2][ind//2])
+fig.subplots_adjust(hspace=0.7)
+```
 
-### Task 1: Create a table clone within the same schema in a warehouse
+![](./media/image39.png)
 
-This task guides you through creating a [table clone](https://learn.microsoft.com/en-in/fabric/data-warehouse/clone-table) in Warehouse in Microsoft Fabric, using the [CREATE TABLE AS CLONE OF](https://learn.microsoft.com/en-us/sql/t-sql/statements/create-table-as-clone-of-transact-sql?view=fabric&preserve-view=true) T-SQL syntax.
+20. Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷
+    Run cell** button and review the output showing the frequency
+    distribution of numerical attributes using histogram.
 
-1. Create a table clone within the same schema in a warehouse.
+```
+columns = df_num_cols.columns[: len(df_num_cols.columns)]
+fig = plt.figure()
+fig.set_size_inches(18, 8)
+length = len(columns)
+for i,j in itertools.zip_longest(columns, range(length)):
+    plt.subplot((length // 2), 3, j+1)
+    plt.subplots_adjust(wspace = 0.2, hspace = 0.5)
+    df_num_cols[i].hist(bins = 20, edgecolor = 'black')
+    plt.title(i)
+plt.show()
+```
 
-1. On the **WideWorldImporters** page, go to the **Home** tab, select **SQL** from the dropdown, and click on **New SQL query**.
+![A screenshot of a computer program AI-generated content may be
+incorrect.](./media/image40.png)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image50.png)
+![A screenshot of a graph AI-generated content may be
+incorrect.](./media/image41.png)
 
-1. In the query editor, paste the following code to create clones of the **dbo.dimension_city** and **dbo.fact_sale** tables.
+21. Perform feature engineering to create new attributes derived from
+    the existing ones. Use the **+ Code** icon below the cell output to
+    add a new code cell to the notebook, and enter the following code in
+    it. Click on **▷ Run cell** button and review the output.
 
-    ```
-    --Create a clone of the dbo.dimension_city table.
-    CREATE TABLE [dbo].[dimension_city1] AS CLONE OF [dbo].[dimension_city];
-    
-    --Create a clone of the dbo.fact_sale table.
-    CREATE TABLE [dbo].[fact_sale1] AS CLONE OF [dbo].[fact_sale];
-    ```
+```
+df_clean["NewTenure"] = df_clean["Tenure"]/df_clean["Age"]
+df_clean["NewCreditsScore"] = pd.qcut(df_clean['CreditScore'], 6, labels = [1, 2, 3, 4, 5, 6])
+df_clean["NewAgeScore"] = pd.qcut(df_clean['Age'], 8, labels = [1, 2, 3, 4, 5, 6, 7, 8])
+df_clean["NewBalanceScore"] = pd.qcut(df_clean['Balance'].rank(method="first"), 5, labels = [1, 2, 3, 4, 5])
+df_clean["NewEstSalaryScore"] = pd.qcut(df_clean['EstimatedSalary'], 10, labels = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+```
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image51.png)
+![](./media/image42.png)
 
-1. Select **Run** to execute the query. The query takes a few seconds to execute. After the query is completed, the table clones **dimension_city1** and **fact_sale1** will be created.
+## Task 5: Use Data Wrangler to perform one-hot encoding
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image52.png)
+Data Wrangler can also be used to perform one-hot encoding. To do so,
+re-open Data Wrangler. This time, select the df_clean data.
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image53.png)
+1.  Use Data Wrangler to perform initial data cleansing, under the
+    notebook ribbon select **AI tools** tab, dropdown the **Data
+    Wrangler** and select the **df_clean** data wrangler.
 
-1. Load the data preview to validate the data loaded successfully by selecting on the **dimension_city1** table in the **Explorer**.
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image43.png)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image54.png)
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image44.png)
 
-1. Right-click on **SQL query** that you’ve created to clone the tables in the **Explorer** and select **Rename**.
+2.  Expand **Formulas** and select **One-hot encode**.
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image55.png)
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image45.png)
 
-1. In the **Rename** dialog box, under the **Name** field, enter +++Clone Table+++, then click on the **Rename** button.
+3.  A panel appears for you to select the list of columns you want to
+    perform one-hot encoding on. Select **Geography** and **Gender** and
+    then Click **Apply**.
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image56.png)
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image46.png)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image57.png)
+4.  Select **Add code to notebook** at the top left to close Data
+    Wrangler and add the code automatically
 
-1. Click on the **Refresh** icon in the command bar below the **Home** tab.
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image47.png)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image58.png)
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image48.png)
 
+5.  Click on **▷ Run cell** button and review the output
 
-### Task 2: Create a table clone across schemas within the same warehouse
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image49.png)
 
-1. On the **WideWorldImporters** page, go to the **Home** tab, select **SQL** from the dropdown, and click on **New SQL query**.
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image50.png)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image59.png)
+## Task 6: Create a delta table for the cleaned data
 
-1. Create a new schema within the **WideWorldImporter** warehouse named +++dbo1+++. **Copy paste** and **run** the following T-SQL code as shown in the below image:
+1.  Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷
+    Run cell** button and review the output
 
-    `CREATE SCHEMA dbo1`
-  
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image60.png)
+```
+table_name = "df_clean"
+# Create a PySpark DataFrame from pandas
+sparkDF=spark.createDataFrame(df_clean) 
+sparkDF.write.mode("overwrite").format("delta").save(f"Tables/{table_name}")
+print(f"Spark DataFrame saved to delta table: {table_name}")
+```
+![](./media/image51.png)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image61.png)
+## Task 7: Train and register a machine learning model
 
-1. In the query editor, remove the existing code and paste the following to create clones of the **dbo.dimension_city** and dbo.**fact_sale tables** in the **dbo1** schema.
+Install the imbalanced-learn library (imported as imblearn) using %pip
+install; this library provides techniques like SMOTE for addressing
+imbalanced datasets. Since the PySpark kernel will restart after
+installation, ensure this cell is run before executing any others.
 
-    ```
-    --Create a clone of the dbo.dimension_city table in the dbo1 schema.
-    CREATE TABLE [dbo1].[dimension_city1] AS CLONE OF [dbo].[dimension_city];
-    
-    --Create a clone of the dbo.fact_sale table in the dbo1 schema.
-    CREATE TABLE [dbo1].[fact_sale1] AS CLONE OF [dbo].[fact_sale];
-    ```
+\[!Alert\] Before training any machine learning model, ensure you load
+the Delta table from the Lakehouse to access the cleaned dataset
+prepared in the previous task.
 
-1. Select **Run** to execute the query. The query takes a few seconds to execute.
+1.  Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷
+    Run cell** button and review the output.
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image62.png)
+```
+SEED = 12345
+df_clean = spark.read.format("delta").load("Tables/df_clean").toPandas()
+```
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image63.png)
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image52.png)
 
-1. After the query is completed, clones **dimension_city1** and **fact_sale1** are created in the **dbo1** schema.
+2.  To generate an experiment for tracking and logging the model using
+    MLflow use the **+ Code** icon below the cell output to add a new
+    code cell to the notebook, and enter the following code in it. Click
+    on **▷ Run cell** button and review the output.
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image64.png)
+```
+import mlflow
+# Set up the experiment name
+EXPERIMENT_NAME = "sample-bank-churn-experiment"  # MLflow experiment name
+```
+![](./media/image53.png)
 
-1. Load the data preview to validate the data loaded successfully by selecting on the **dimension_city1** table under **dbo1** schema in the **Explorer**.
+3.  Set experiment and autologging specifications. Use the **+
+    Code** icon below the cell output to add a new code cell to the
+    notebook, and enter the following code in it. Click on **▷ Run
+    cell** button and review the output.
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image65.png)
+```
+mlflow.set_experiment(EXPERIMENT_NAME) # Use a date stamp to append to the experiment
+mlflow.autolog(exclusive=False)
+```
 
-1. **Rename** the query for reference later. Right-click on **SQL query 1** in the **Explorer** and select **Rename**.
+![](./media/image54.png)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image66.png)
+\[!Note\] With the data now loaded, the next step is to define and train
+machine learning models. This notebook demonstrates how to implement
+Random Forest and **LightGBM** using
+the **scikit-learn** and **lightgbm** libraries in just a few lines of
+code.
 
-1. In the **Rename** dialog box, under the **Name** field, enter +++Clone Table in another schema+++. Then, click on **Rename** button.
+4.  Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷
+    Run cell** button and review the output
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image67.png)
+```
+# Import the required libraries for model training
+from sklearn.model_selection import train_test_split
+from lightgbm import LGBMClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, f1_score, precision_score, confusion_matrix, recall_score, roc_auc_score, classification_report
+```
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image55.png)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image68.png)
+5.  Use the train_test_split function from **scikit-learn** to split the
+    data into training, validation, and test sets. Select the **+
+    Code** icon below the cell output to add a new code cell to the
+    notebook, and enter the following code in it. Click on **▷ Run
+    cell** button and review the output.
 
-1. Click on the **Refresh** icon in the command bar below the **Home** tab.
+```
+y = df_clean["Exited"]
+X = df_clean.drop("Exited",axis=1)
+# Train/test separation
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=SEED)
+```
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image69.png)
+![](./media/image56.png)
 
+6.  Apply SMOTE to the training data to synthesize new samples for the
+    minority class. Use the **+ Code** icon below the cell output to add
+    a new code cell to the notebook, and enter the following code in it.
+    Click on **▷ Run cell** button and review the output
 
-## **Exercise 5: Transform data using a stored procedure**
+```
+from collections import Counter
+from imblearn.over_sampling import SMOTE
 
-Learn how to create and save a new stored procedure to transform data.
+# SMOTE and most scikit-learn / imblearn utilities require purely numeric feature matrices.
+# Your X_train currently includes categorical columns such as 'Geography', 'Gender', etc.
+# We need to one-hot encode the non-numeric columns before calling SMOTE.
 
-1. On the **WideWorldImporters** page, go to the **Home** tab, select **SQL** from the dropdown, and click on **New SQL query**.
+# Identify numeric and non-numeric columns
+X_train_num = X_train.select_dtypes(include=["number"])
+X_train_cat = X_train.select_dtypes(exclude=["number"])
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image70.png)
+# One-hot encode categorical columns (drop_first to avoid multicollinearity)
+if not X_train_cat.empty:
+    X_train_cat_encoded = pd.get_dummies(X_train_cat, drop_first=True)
+    X_train_encoded = pd.concat([X_train_num.reset_index(drop=True),
+                                 X_train_cat_encoded.reset_index(drop=True)], axis=1)
+else:
+    X_train_encoded = X_train_num.copy()
 
-1. In the query editor, **paste** the following code to create the stored procedure **dbo.populate_aggregate_sale_by_city**. This stored procedure will create and load the **dbo.aggregate_sale_by_date_city** table in a later step.
+# Apply SMOTE on the fully numeric matrix
+sm = SMOTE(random_state=SEED)
+X_res, y_res = sm.fit_resample(X_train_encoded, y_train)
 
-    ```
-    --Drop the stored procedure if it already exists.
-    DROP PROCEDURE IF EXISTS [dbo].[populate_aggregate_sale_by_city]
-    GO
-    
-    --Create the populate_aggregate_sale_by_city stored procedure.
-    CREATE PROCEDURE [dbo].[populate_aggregate_sale_by_city]
-    AS
-    BEGIN
-        --If the aggregate table already exists, drop it. Then create the table.
-        DROP TABLE IF EXISTS [dbo].[aggregate_sale_by_date_city];
-        CREATE TABLE [dbo].[aggregate_sale_by_date_city]
-            (
-                [Date] [DATETIME2](6),
-                [City] [VARCHAR](8000),
-                [StateProvince] [VARCHAR](8000),
-                [SalesTerritory] [VARCHAR](8000),
-                [SumOfTotalExcludingTax] [DECIMAL](38,2),
-                [SumOfTaxAmount] [DECIMAL](38,6),
-                [SumOfTotalIncludingTax] [DECIMAL](38,6),
-                [SumOfProfit] [DECIMAL](38,2)
-            );
-    
-        --Reload the aggregated dataset to the table.
-        INSERT INTO [dbo].[aggregate_sale_by_date_city]
-        SELECT
-            FS.[InvoiceDateKey] AS [Date], 
-            DC.[City], 
-            DC.[StateProvince], 
-            DC.[SalesTerritory], 
-            SUM(FS.[TotalExcludingTax]) AS [SumOfTotalExcludingTax], 
-            SUM(FS.[TaxAmount]) AS [SumOfTaxAmount], 
-            SUM(FS.[TotalIncludingTax]) AS [SumOfTotalIncludingTax], 
-            SUM(FS.[Profit]) AS [SumOfProfit]
-        FROM [dbo].[fact_sale] AS FS
-        INNER JOIN [dbo].[dimension_city] AS DC
-            ON FS.[CityKey] = DC.[CityKey]
-        GROUP BY
-            FS.[InvoiceDateKey],
-            DC.[City], 
-            DC.[StateProvince], 
-            DC.[SalesTerritory]
-        ORDER BY 
-            FS.[InvoiceDateKey], 
-            DC.[StateProvince], 
-            DC.[City];
-    END
-    ```
+# Build the resampled training DataFrame
+new_train = pd.concat([X_res, y_res.reset_index(drop=True)], axis=1)
+new_train.head()
+```
+![](./media/image57.png)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image71.png)
+![](./media/image58.png)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image72.png)
+7.  Train the model using Random Forest with maximum depth of 4 and 4
+    features. Use the **+ Code** icon below the cell output to add a new
+    code cell to the notebook, and enter the following code in it. Click
+    on **▷ Run cell** button and review the output.
 
-1. Right-click on SQL query that you’ve created to clone the tables in the Explorer and select **Rename**.
+```
+mlflow.sklearn.autolog(registered_model_name='rfc1_sm')  # Register the trained model with autologging
+rfc1_sm = RandomForestClassifier(max_depth=4, max_features=4, min_samples_split=3, random_state=1) # Pass hyperparameters
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image73.png)
+# Ensure test features have the same encoding as the training data used with SMOTE
+# 1) Build the same preprocessing for X_test as was done for X_train before SMOTE
+X_test_num = X_test.select_dtypes(include=["number"])
+X_test_cat = X_test.select_dtypes(exclude=["number"])
 
-1. In the **Rename** dialog box, under the **Name** field, enter `Create Aggregate Procedure`, then click on the **Rename** button.
+if not X_test_cat.empty:
+    X_test_cat_encoded = pd.get_dummies(X_test_cat, drop_first=True)
+    X_test_encoded = pd.concat([
+        X_test_num.reset_index(drop=True),
+        X_test_cat_encoded.reset_index(drop=True)
+    ], axis=1)
+else:
+    X_test_encoded = X_test_num.copy()
+
+# 2) Align test feature columns with the training feature columns used for fitting the model
+#    (X_res is the resampled, fully numeric training matrix after SMOTE)
+missing_cols = set(X_res.columns) - set(X_test_encoded.columns)
+for c in missing_cols:
+    X_test_encoded[c] = 0  # add any missing dummy columns as zeros
+
+# Keep only the columns that the model saw during fit, in the same order
+X_test_encoded = X_test_encoded[X_res.columns]
+
+with mlflow.start_run(run_name="rfc1_sm") as run:
+    rfc1_sm_run_id = run.info.run_id # Capture run_id for model prediction later
+    print("run_id: {}; status: {}".format(rfc1_sm_run_id, run.info.status))
+
+    # Fit on the resampled, encoded training data
+    rfc1_sm.fit(X_res, y_res.ravel())  # Balanced training data
+
+    # Evaluate on the encoded test data
+    rfc1_sm.score(X_test_encoded, y_test)
+    y_pred = rfc1_sm.predict(X_test_encoded)
+
+    cr_rfc1_sm = classification_report(y_test, y_pred)
+    cm_rfc1_sm = confusion_matrix(y_test, y_pred)
+    roc_auc_rfc1_sm = roc_auc_score(y_res, rfc1_sm.predict_proba(X_res)[:, 1])
+```
+![](./media/image59.png)
+
+![](./media/image60.png)
+
+8.  Train the model using Random Forest with maximum depth of 8 and 6
+    features. Use the **+ Code** icon below the cell output to add a new
+    code cell to the notebook, and enter the following code in it. Click
+    on **▷ Run cell** button and review the output
+
+```
+mlflow.sklearn.autolog(registered_model_name='rfc2_sm')  # Register the trained model with autologging
+rfc2_sm = RandomForestClassifier(max_depth=8, max_features=6, min_samples_split=3, random_state=1) # Pass hyperparameters
+
+# Ensure test features have the same encoding as the training data used with SMOTE
+# 1) Build the same preprocessing for X_test as was done for X_train before SMOTE
+X_test_num = X_test.select_dtypes(include=["number"])
+X_test_cat = X_test.select_dtypes(exclude=["number"])
+
+if not X_test_cat.empty:
+    X_test_cat_encoded = pd.get_dummies(X_test_cat, drop_first=True)
+    X_test_encoded = pd.concat([
+        X_test_num.reset_index(drop=True),
+        X_test_cat_encoded.reset_index(drop=True)
+    ], axis=1)
+else:
+    X_test_encoded = X_test_num.copy()
 
-    ![A screenshot of a computer screen Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image74.png)
+# 2) Align test feature columns with the training feature columns used for fitting the model
+#    (X_res is the resampled, fully numeric training matrix after SMOTE)
+missing_cols = set(X_res.columns) - set(X_test_encoded.columns)
+for c in missing_cols:
+    X_test_encoded[c] = 0  # add any missing dummy columns as zeros
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image75.png)
+# Keep only the columns that the model saw during fit, in the same order
+X_test_encoded = X_test_encoded[X_res.columns]
 
-1. Click on the **Refresh icon** below the **Home** tab.
+with mlflow.start_run(run_name="rfc2_sm") as run:
+    rfc2_sm_run_id = run.info.run_id # Capture run_id for model prediction later
+    print("run_id: {}; status: {}".format(rfc2_sm_run_id, run.info.status))
+    # rfc2.fit(X_train,y_train) # Imbalanced training data
+    rfc2_sm.fit(X_res, y_res.ravel()) # Balanced training data
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image76.png)
+    # Evaluate on the encoded test data
+    rfc2_sm.score(X_test_encoded, y_test)
+    y_pred = rfc2_sm.predict(X_test_encoded)
 
-1. In the **Explorer** tab, verify that you can see the newly created stored procedure by expanding the **Stored Procedures** node under the **dbo** schema.
+    cr_rfc2_sm = classification_report(y_test, y_pred)
+    cm_rfc2_sm = confusion_matrix(y_test, y_pred)
+    roc_auc_rfc2_sm = roc_auc_score(y_res, rfc2_sm.predict_proba(X_res)[:, 1])
+```
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image77.png)
+![](./media/image61.png)
 
-1. On the **WideWorldImporters** page, go to the **Home** tab, select **SQL** from the dropdown, and click on **New SQL query**.
+![](./media/image62.png)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image78.png)
+![](./media/image63.png)
 
-1. In the query editor, paste the following code. This T-SQL executes **dbo.populate_aggregate_sale_by_city** to create the **dbo.aggregate_sale_by_date_city** table.Run the query.
+9.  Train the model using LightGBM. Use the **+ Code** icon below the
+    cell output to add a new code cell to the notebook, and enter the
+    following code in it. Click on **▷ Run cell** button and review the
+    output
 
-    ```
-    --Execute the stored procedure to create the aggregate table.
-    EXEC [dbo].[populate_aggregate_sale_by_city];
-    ```
+```
+# lgbm_model
+mlflow.lightgbm.autolog(registered_model_name='lgbm_sm')  # Register the trained model with autologging
+lgbm_sm_model = LGBMClassifier(
+    learning_rate=0.07,
+    max_delta_step=2,
+    n_estimators=100,
+    max_depth=10,
+    eval_metric="logloss",
+    objective='binary',
+    random_state=42
+)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image79.png)
+# --- IMPORTANT ---
+# The model was trained on the SMOTE-resampled, one-hot-encoded feature matrix X_res.
+# To avoid the "Number of features of the model must match the input" error,
+# we must apply the *same* encoding logic to X_test and align its columns
+# to match X_res before calling predict / predict_proba.
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image80.png)
+# 1) Build encoded test features, mirroring the preprocessing of X_train
+X_test_num = X_test.select_dtypes(include=["number"])
+X_test_cat = X_test.select_dtypes(exclude=["number"])
 
-1. To save this query for reference later, right-click on the query tab just above the editor and select **Rename.**
+if not X_test_cat.empty:
+    X_test_cat_encoded = pd.get_dummies(X_test_cat, drop_first=True)
+    X_test_encoded = pd.concat([
+        X_test_num.reset_index(drop=True),
+        X_test_cat_encoded.reset_index(drop=True)
+    ], axis=1)
+else:
+    X_test_encoded = X_test_num.copy()
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image81.png)
+# 2) Align columns with X_res (training features) used to fit the model
+missing_cols = set(X_res.columns) - set(X_test_encoded.columns)
+for c in missing_cols:
+    X_test_encoded[c] = 0  # add any missing dummy columns with zeros
 
-1. In the **Rename** dialog box, under the **Name** field, enter +++Run** **Create Aggregate Procedure+++, then click on the **Rename** button.
+# Keep only the columns that the model saw during fit, in the same order
+X_test_encoded = X_test_encoded[X_res.columns]
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image82.png)
+with mlflow.start_run(run_name="lgbm_sm") as run:
+    lgbm1_sm_run_id = run.info.run_id  # Capture run_id for model prediction later
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image83.png)
+    # Fit on the resampled, encoded training data
+    lgbm_sm_model.fit(X_res, y_res.ravel())  # Balanced training data
 
-1. Select the **Refresh** icon on the ribbon.
+    # Predict on the encoded test data to match training feature space
+    y_pred = lgbm_sm_model.predict(X_test_encoded)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image84.png)
+    accuracy = accuracy_score(y_test, y_pred)
+    cr_lgbm_sm = classification_report(y_test, y_pred)
+    cm_lgbm_sm = confusion_matrix(y_test, y_pred)
+    roc_auc_lgbm_sm = roc_auc_score(y_res, lgbm_sm_model.predict_proba(X_res)[:, 1])
+```
 
-1. In the Object **Explorer** tab, load the data preview to validate the data loaded successfully by selecting on the **aggregate_sale_by_city** table in the **Explorer**.
+![](./media/image64.png)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image85.png)
+![](./media/image65.png)
 
+## Task 8: Experiments artifact for tracking model performance
 
-## Exercise 6: Time travel using T-SQL at statement level
+1.  Select **Data-Science@lab.LabInstance.IdX** in the left navigation
+    pane.
 
-1. On the **WideWorldImporters** page, go to the **Home** tab, select **SQL** from the dropdown, and click on **New SQL query**.
+![](./media/image66.png)
+
+2.  On the top right, drop down the filter and select Experiments.
+
+![](./media/image67.png)
+
+3.  Select **sample** **bank-churn-experiment**
+
+![](./media/image68.png)
+
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image69.png)
+
+## Task 9: Assess the performances of the trained models on the validation dataset
+
+1.  Select **Notebook1** in the top navigation pane.
+
+![](./media/image70.png)
+
+2.  Open the saved experiment from the workspace, load the machine
+    learning models, and evaluate their performance on the validation
+    dataset.
+
+3.  Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷
+    Run cell** button and review the output
+
+```
+# Define run_uri to fetch the model
+# MLflow client: mlflow.model.url, list model
+load_model_rfc1_sm = mlflow.sklearn.load_model(f"runs:/{rfc1_sm_run_id}/model")
+load_model_rfc2_sm = mlflow.sklearn.load_model(f"runs:/{rfc2_sm_run_id}/model")
+load_model_lgbm1_sm = mlflow.lightgbm.load_model(f"runs:/{lgbm1_sm_run_id}/model")
+```
+
+![](./media/image71.png)
+
+4.  Directly assess the performance of the trained machine learning
+    models on the validation dataset.
+
+5.  Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷
+    Run cell** button and review the output
+
+```
+# Use the same encoding pipeline for X_test that was used to train the models (X_res)
+
+# 1) Split numeric and categorical columns in the original X_test
+X_test_num = X_test.select_dtypes(include=["number"])
+X_test_cat = X_test.select_dtypes(exclude=["number"])
+
+# 2) One-hot encode the categorical columns (same as training: drop_first=True)
+if not X_test_cat.empty:
+    X_test_cat_encoded = pd.get_dummies(X_test_cat, drop_first=True)
+    X_test_encoded = pd.concat([
+        X_test_num.reset_index(drop=True),
+        X_test_cat_encoded.reset_index(drop=True)
+    ], axis=1)
+else:
+    X_test_encoded = X_test_num.copy()
+
+# 3) Align encoded test features to the training feature space used for fitting (X_res.columns)
+#    - Add any missing columns with zeros
+missing_cols = set(X_res.columns) - set(X_test_encoded.columns)
+for c in missing_cols:
+    X_test_encoded[c] = 0
+
+#    - Drop any extra columns not seen during training
+extra_cols = set(X_test_encoded.columns) - set(X_res.columns)
+if extra_cols:
+    X_test_encoded = X_test_encoded.drop(columns=list(extra_cols))
+
+#    - Reorder columns to exactly match the training feature order
+X_test_encoded = X_test_encoded[X_res.columns]
+
+# 4) Use the loaded models to predict on the encoded feature matrix
+ypred_rfc1_sm = load_model_rfc1_sm.predict(X_test_encoded)  # Random forest with max depth 4 and 4 features
+ypred_rfc2_sm = load_model_rfc2_sm.predict(X_test_encoded)  # Random forest with max depth 8 and 6 features
+ypred_lgbm1_sm = load_model_lgbm1_sm.predict(X_test_encoded)  # LightGBM
+```
+
+![](./media/image72.png)
+
+6.  To evaluate the accuracy of the classification model, generate and
+    analyze the confusion matrix using predictions from the validation
+    dataset.
+
+7.  Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷
+    Run cell** button and review the output
+
+```
+def plot_confusion_matrix(cm, classes,
+                          normalize=False,
+                          title='Confusion matrix',
+                          cmap=plt.cm.Blues):
+    print(cm)
+    plt.figure(figsize=(4,4))
+    plt.rcParams.update({'font.size': 10})
+    plt.imshow(cm, interpolation='nearest', cmap=cmap)
+    plt.title(title)
+    plt.colorbar()
+    tick_marks = np.arange(len(classes))
+    plt.xticks(tick_marks, classes, rotation=45, color="blue")
+    plt.yticks(tick_marks, classes, color="blue")
+
+    fmt = '.2f' if normalize else 'd'
+    thresh = cm.max() / 2.
+    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+        plt.text(j, i, format(cm[i, j], fmt),
+                 horizontalalignment="center",
+                 color="red" if cm[i, j] > thresh else "black")
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image86.png)
+    plt.tight_layout()
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
+```
+
+![](./media/image73.png)
 
-1. In the query editor, paste the following code to create the view Top10CustomerView. Select **Run** to execute the query.
+8.  Confusion Matrix for Random Forest Classifier with maximum depth of
+    4 and 4 features
 
-    ```
-    CREATE VIEW dbo.Top10CustomersView
-    AS
-    SELECT TOP (10)
-        FS.[CustomerKey],
-        DC.[Customer],
-        SUM(FS.TotalIncludingTax) AS TotalSalesAmount
-    FROM
-        [dbo].[dimension_customer] AS DC
-    INNER JOIN
-        [dbo].[fact_sale] AS FS ON DC.[CustomerKey] = FS.[CustomerKey]
-    GROUP BY
-        FS.[CustomerKey],
-        DC.[Customer]
-    ORDER BY
-        TotalSalesAmount DESC;
-    ```
+9.  Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷
+    Run cell** button and review the output
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image87.png)
+```
+cfm = confusion_matrix(y_test, y_pred=ypred_rfc1_sm)
+plot_confusion_matrix(cfm, classes=['Non Churn','Churn'],
+                      title='Random Forest with max depth of 4')
+tn, fp, fn, tp = cfm.ravel()
+```
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image88.png)
+![](./media/image74.png)
 
-1. In the **Explorer**, verify that you can see the newly created view **Top10CustomersView** by expanding the **View** node under **dbo** schema.
+10. Confusion Matrix for Random Forest Classifier with maximum depth of
+    8 and 6 features
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image89.png)
+11. Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷
+    Run cell** button and review the output
 
-1. To save this query for reference later, right-click on the query tab just above the editor and select **Rename.**
+```
+cfm = confusion_matrix(y_test, y_pred=ypred_rfc2_sm)
+plot_confusion_matrix(cfm, classes=['Non Churn','Churn'],
+                      title='Random Forest with max depth of 8')
+tn, fp, fn, tp = cfm.ravel()
+```
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image90.png)
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image75.png)
 
-1. In the **Rename** dialog box, under the **Name** field, enter +++Top10CustomersView+++, then click on the **Rename** button.
+12. Confusion Matrix for LightGBM. Use the **+ Code** icon below the
+    cell output to add a new code cell to the notebook, and enter the
+    following code in it. Click on **▷ Run cell** button and review the
+    output.
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image91.png)
+```
+cfm = confusion_matrix(y_test, y_pred=ypred_lgbm1_sm)
+plot_confusion_matrix(cfm, classes=['Non Churn','Churn'],
+                      title='LightGBM')
+tn, fp, fn, tp = cfm.ravel()
+```
 
-1. Create another new query, similar to Step 1. From the **Home** tab of the ribbon, select **New SQL query**.
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image76.png)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image92.png)
+## Task 10: Save results for Power BI
 
-1. In the query editor, paste the following code. This updates the **TotalIncludingTax** column value to **200000000** for the record which has the **SaleKey **value of **22632918.** Select **Run** to execute the query.
+1.  Save the delta frame to the lakehouse, to move the model prediction
+    results to a Power BI visualization.
 
-    ```
-    /*Update the TotalIncludingTax value of the record with SaleKey value of 22632918*/
-    UPDATE [dbo].[fact_sale]
-    SET TotalIncludingTax = 200000000
-    WHERE SaleKey = 22632918;
-    ```
+2.  Load the test data. Use the **+ Code** icon below the cell output to
+    add a new code cell to the notebook, and enter the following code in
+    it. Click on **▷ Run cell** button and review the output
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image93.png)
+```
+df_pred = X_test.copy()
+df_pred['y_test'] = y_test
+df_pred['ypred_rfc1_sm'] = ypred_rfc1_sm
+df_pred['ypred_rfc2_sm'] =ypred_rfc2_sm
+df_pred['ypred_lgbm1_sm'] = ypred_lgbm1_sm
+table_name = "df_pred_results"
+sparkDF=spark.createDataFrame(df_pred)
+sparkDF.write.mode("overwrite").format("delta").option("overwriteSchema", "true").save(f"Tables/{table_name}")
+print(f"Spark DataFrame saved to delta table: {table_name}")
+```
+![](./media/image77.png)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image94.png)
+![](./media/image78.png)
 
-1. In the query editor, paste the following code. The CURRENT_TIMESTAMP T-SQL function returns the current UTC timestamp as a **datetime**. Select **Run** to execute the query.
+## Task 11: Create a semantic model
 
-    `SELECT CURRENT_TIMESTAMP;`
+1.  Now, click on **FabricData_Sciencelakehouse** on the top navigation
+    pane
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image95.png)
+![](./media/image79.png)
 
-1. Copy the timestamp value returned to your clipboard.
+2.  Select **New semantic model** on the top ribbon.
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image96.png)
+![](./media/image80.png)
 
-1. Paste the following code in the query editor and replace the timestamp value with the current timestamp value obtained from the prior step. The timestamp syntax format is **YYYY-MM-DDTHH:MM:SS\[.FFF\].**
+3.  In the **New dataset** box, enter the dataset a name, such as
+    +++**bank churn predictions**+++ . Then select
+    the **df_pred_results** dataset and select **Confirm**.
 
-1. Remove the trailing zeroes, for example: **2025-06-09T06:16:08.807**.
+![](./media/image81.png)
 
-1. The following example returns the list of top ten customers by **TotalIncludingTax**, including the new value for **SaleKey** 22632918. Replace the existing code and paste the following code and select **Run** to execute the query.
+![](./media/image82.png)
 
-    ```
-    /*View of Top10 Customers as of today after record updates*/
-    SELECT *
-    FROM [WideWorldImporters].[dbo].[Top10CustomersView]
-    OPTION (FOR TIMESTAMP AS OF '2025-06-09T06:16:08.807');
-    ```
+4.  Select [**Data-Science@lab.LabInstance.IdX**](mailto:Data-Science@lab.LabInstance.IdX) in
+    the left navigation pane.
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image97.png)
+5.  Select and right-click the ***Bank Churn Predictions*** semantic
+    model, then select ***Auto-create a report***, as shown in the
+    following image.
 
-1. Paste the following code in the query editor and replace the timestamp value to a time prior to executing the update script to update the **TotalIncludingTax** value. This would return the list of top ten customers *before* the **TotalIncludingTax** was updated for **SaleKey** 22632918. Select **Run** to execute the query.
+> ![](./media/image83.png)
 
-    ```
-    /*View of Top10 Customers as of today before record updates*/
-    SELECT *
-    FROM [WideWorldImporters].[dbo].[Top10CustomersView]
-    OPTION (FOR TIMESTAMP AS OF '2024-04-24T20:49:06.097');
-    ```
+![](./media/image84.png)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image98.png)
+6.  Save this report for the future by selecting **Save** from the top
+    ribbon.
 
+![](./media/image85.png)
 
-## Exercise 7: Create a query with the visual query builder
+7.  In the **Save your replort** dialog box, enter a name for your
+    report as +++**Bank churn**+++ and select **Save.**
 
-### Task 1: Use the visual query builder
+![](./media/image86.png)
 
-Create and save a query with the visual query builder in the Microsoft Fabric portal.
+8.  Select **bank churn predictions** semantic model in the left
+    navigation pane
 
-1. In the **WideWolrdImporters** page, from the **Home** tab of the ribbon, select **New visual query**.
+![](./media/image87.png)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image99.png)
+9.  In Home page, dropdown the Editing and select **Editing**
 
-1. Right-click on **fact_sale** and select **Insert into canvas**
+![](./media/image88.png)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image100.png)
+## Task 12: Add new measures
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image101.png)
+1.  Add a new measure for the churn rate.
 
-1. Navigate to query design pane **transformations ribbon** and limit the dataset size by clicking on **Reduce rows** dropdown, then click on **Keep top rows** as shown in the below image.
+    1.  Select **New measure** in the top ribbon. This action adds a new
+        item named +++Measure+++ to
+        the **customer_churn_test_predictions** dataset, and opens a
+        formula bar above the table.
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image102.png)
+![](./media/image89.png)
 
-1. In the **Keep top rows** dialog box, enter +++10000+++ and Select **OK**.
+![](./media/image90.png)
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image103.png)
+2.  To determine the average predicted churn rate, replace Measure = in
+    the formula bar with:
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image104.png)
++++Churn Rate = AVERAGE(df_pred_results[CreditScore])+++
 
-1. Right-click on **dimension_city** and select **Insert into canvas**
+![](./media/image91.png)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image105.png)
+3.  To apply the formula, select the **check mark** in the formula bar.
+    The new measure appears in the data table. The calculator icon shows
+    it was created as a measure.
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image106.png)
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image92.png)
 
-1. From the transformations ribbon, select the dropdown beside **Combine** and select **Merge queries as new** as shown in the below image.
+4.  Change the format from **General** to **Percentage** in
+    the **Properties** panel.
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image107.png)
+5.  Scroll down in the **Properties** panel to change the **Decimal
+    places** to 1.
 
-1. On the **Merge** settings page enter the following details.
+![](./media/image93.png)
 
-    - In the **Left table for merge** dropdown, choose **dimension_city**
-    - In the **Right table for merge** dropdown, choose **fact_sale** (use
-    horizontal and vertical scroll bar)
+2.  Add a new measure that counts the total number of bank customers.
+    You'll need it for the rest of the new measures.
 
-    - Select the **CityKey** field in the **dimension_city** table by
-    selecting on the column name in the header row to indicate the join column.
+    1.  Select **New measure** in the top ribbon to add a new item named
+        +++Measure+++ to the customer_churn_test_predictions dataset.
+        This action also opens a formula bar above the table.
 
-    - Select the **CityKey** field in the **fact_sale** table by selecting
-    on the column name in the header row to indicate the join column.
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image94.png)
 
-    - In the **Join kind** diagram selection, choose **Inner** and click on
-    the **Ok** button.
+2.  Each prediction represents one customer. To determine the total
+    number of customers, replace Measure = in the formula bar with:
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image108.png)
++++Customers = COUNT(df_pred_results[CreditScore])+++
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image109.png)
+3.  Select the **check mark** in the formula bar to apply the formula.
 
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image95.png)
 
-1. With the **Merge** step selected, select the **Expand** button beside **fact_sale** on the header of the data grid as shown in the below image, then select the columns **TaxAmount, Profit, TotalIncludingTax** and select **Ok.**
+3.  Add the churn rate for Germany.
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image110.png)
+    1.  Select **New measure** in the top ribbon to add a new item named
+        +++Measure+++ to the customer_churn_test_predictions dataset.
+        This action also opens a formula bar above the table.
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image111.png)
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image96.png)
 
-1. In the **transformations ribbon,** click on the dropdown beside **Transform**, then select **Group by**.
+2.  To determine the churn rate for Germany, replace Measure = in the
+    formula bar with:
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image112.png)
+```
+Germany Churn = CALCULATE(
+    [Churn Rate],
+    df_pred_results[Geography_Germany] = 1
+```
 
-1. On the **Group by** settings page, enter the following details.
+3.  To apply the formula, select the **check mark** in the formula bar.
 
-    - Select **Advanced** radio button.
-    - Under **Group by** select the following:
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image97.png)
 
+This filters the rows down to the ones with Germany as their geography
+(Geography_Germany equals one).
 
-    1. **Country**
+4.  Repeat the above step to add the churn rates for France and Spain.
 
-    1. **StateProvince**
+    1.  **Spain's churn rate**: Select **New measure** in the top ribbon
+        to add a new item named +++Measure+++ to the
+        customer_churn_test_predictions dataset. This action also opens
+        a formula bar above the table.
 
-    1. **City**
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image98.png)
 
-        - In the **New column name,** enter +++SumOfTaxAmount+++ in **Operation**
-    column field, select **Sum**, then under **Column** field, select **TaxAmount.** Click on **Add aggregation** to add more aggregate column and operation.
+2.  Select the **check mark** in the formula bar to apply the formula
 
-        - In the **New column name,** enter +++SumOfProfit+++ in **Operation**
-    column field, select **Sum**, then under **Column** field, select **Profit**. Click on **Add aggregation** to add more aggregate column and operation.
+```
+Spain Churn = CALCULATE(
+    [Churn Rate],
+    df_pred_results[Geography_Spain] = 1
+)
+```
 
-        - In the **New column name**, enter +++SumOfTotalIncludingTax+++ in
-    **Operation** column field, select **Sum**, then under **Column** field, **TotalIncludingTax.**
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image99.png)
 
-        - Click on the **OK** button
+5.  France's churn rate: Select **New measure** in the top ribbon to add
+    a new item named +++Measure+++ to the
+    customer_churn_test_predictions dataset. This action also opens a
+    formula bar above the table.
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image113.png)
+6.  Select the **check mark** in the formula bar to apply the formula
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image114.png)
+```
+France Churn = CALCULATE(
+    [Churn Rate],
+    df_pred_results[Geography_France] = 1
+```
 
+![](./media/image100.png)
 
-1. In the explorer, navigate to **Queries** and right-click on **Visual query 1** under **Queries**. Then, select **Rename**.
+## Task 13: Create new report
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image115.png)
+1.  From the top ribbon, select **File** and select **New report** to
+    start creating reports/dashboards in Power BI.
 
-1. Type +++Sales Summary+++ to change the name of the query. Press **Enter** on the keyboard or select anywhere outside the tab to save the change.
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image101.png)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image116.png)
+2.  In the Ribbon, select **Text box**. Type in +++**Bank Customer
+    Churn+++**. **Highlight** the **text** Change the font size and
+    background color in the Format panel. Adjust the font size and color
+    by selecting the text and using the format bar.
 
-1. Click on the **Refresh** icon below the **Home** tab.
+![](./media/image102.png)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image117.png)
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image103.png)
 
+3.  In the Visualizations panel, select the **Card** icon. From
+    the **Data** pane, select **Churn Rate**. Change the font size and
+    background color in the Format panel. Drag this visualization to the
+    top right of the report.
 
-## **Exercise 8: Analyze data with a notebook**
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image104.png)
 
-### Task 1: Create a lakehouse shortcut and Analyze data with an notebook
+4.  In the Visualizations panel, select the **Line and stacked column
+    chart** icon.
 
-In this task, learn about how you can save your data once and then use it with many other services. Shortcuts can also be created to data stored in Azure Data Lake Storage and S3 to enable you to directly access delta tables from external systems.
+5.  The chart shows on the report. In the Data pane, select
 
-First, we create a new lakehouse. To create a new lakehouse in your Microsoft Fabric workspace:
+    - Age
 
-1. On the **WideWorldImportes** page, click on **Warehouse_FabricXX** Workspace on the left-sided navigation menu.
+    - Churn Rate
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image118.png)
+    - Customers
 
-1. On the **Synapse Data Engineering Warehouse_FabricXX** home page, under the **Warehouse_FabricXX** pane, click **+New item**, and then select **Lakehouse **under **Stored data**
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image105.png)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image119.png)
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image106.png)
 
-1. In the **Name** field, enter +++ShortcutExercise+++ and click on the **Create** button.
+6.  In the Visualizations panel, select the **Line and stacked column
+    chart** icon. Select **NumOfProducts** for x-axis, **Churn
+    Rate** for column y-axis, and **Customers** for the line y-axis.
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image120.png)
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image107.png)
 
-1. The new lakehouse loads and the **Explorer** view opens up, with the **Get data in your lakehouse** menu. Under **Load data in your lakehouse**, select the **New shortcut** button.
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image108.png)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image121.png)
+7.  In the Visualizations panel, select the **Stacked column
+    chart** icon. Select **NewCreditsScore** for x-axis and **Churn
+    Rate** for y-axis.
 
-1. In the **New shortcut** window, select **Microsoft OneLake**.
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image109.png)
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image122.png)
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image110.png)
 
-1. In the **Select a data source type** window, carefully navigate and click on the **Warehouse** named +++WideWorldImporters+++ that you’ve created previously, then click on the **Next** button**.**
+8.  Change the title **NewCreditsScore** to **Credit Score** in the
+    Format panel. Select **Format your visuals** and dropdown
+    the **X-axis**, enter the Title text as +++Credit Score+++.
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image123.png)
+![](./media/image111.png)
 
-1. In the **OneLake** object browser, expand **Tables**, then expand the **dbo** schema, and select the radio button beside **dimension_customer**. Select the **Next** button.
+![](./media/image112.png)
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image124.png)
+9.  From the ribbon, select **File** \> **Save**.
 
-1. In the **New shortcut** window, click on the **Create** button and click on the **Close** button
+![](./media/image113.png)
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image125.png)
+10. Enter the name of your report as **Bank churn Power BI report**.
+    Select **Save**
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image126.png)
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image114.png)
 
-1. Wait for a while and then click on the **Refresh** icon.
+The Power BI report shows:
 
-1. Then, select the **dimension_customer **in the **Table** list to preview the data. Notice that the lakehouse is showing the data from the **dimension_customer** table from the Warehouse.
+- Customers who use more than two of the bank products have a higher
+  churn rate although few customers had more than two products. The bank
+  should collect more data, but also investigate other features
+  correlated with more products (see the plot in the bottom left panel).
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image127.png)
+- Bank customers in Germany have a higher churn rate than in France and
+  Spain (see the plot in the bottom right panel), which suggests that an
+  investigation into what has encouraged customers to leave could be
+  beneficial.
 
-1. Next, create a new notebook to query the **dimension_customer** table. In the **Home** ribbon, select the drop down for **Open notebook** and choose **New notebook**.
+- There are more middle aged customers (between 25-45) and customers
+  between 45-60 tend to exit more.
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image128.png)
+- Finally, customers with lower credit scores would most likely leave
+  the bank for other financial institutes. The bank should look into
+  ways that encourage customers with lower credit scores and account
+  balances to stay with the bank.
 
-1. Select, then drag the **dimension_customer** from the **Tables** list into the open notebook cell. You can see a **PySpark** query has been written for you to query all the data from **ShortcutExercise.dimension_customer**. This notebook experience is similar to Visual Studio Code Jupyter notebook experience. You can also open the notebook in VS Code.
+## Task 14: Clean up resources
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image129.png)
+You can delete individual reports, pipelines, warehouses, and other
+items or remove the entire workspace. Use the following steps to delete
+the workspace you created for this tutorial.
 
-1. In the **Home** ribbon, select the **Run all** button. Once the query is completed, you will see you can easily use PySpark to query the Warehouse tables!
+1.  Select your workspace,
+    the [**Data-Science@lab.LabInstance.IdX**](mailto:Data-Science@lab.LabInstance.IdX) from
+    the left-hand navigation menu. It opens the workspace item view.
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image130.png)
+2.  Select the **...** option under the workspace name and
+    select **Workspace settings**.
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image131.png)
+![](./media/image115.png)
 
+3.  Select **General tab** and **Remove this workspace.**
 
-## **Exercise 9: Create cross-warehouse queries with the SQL query editor**
-
-### Task 1: Add multiple warehouses to the Explorer
-
-In this task, learn about how you can easily create and execute T-SQL queries with the SQL query editor across multiple warehouse, including joining together data from a SQL Endpoint and a Warehouse in Microsoft Fabric.
-
-1. From **Notebook1** page, navigate and click on **Warehouse_FabricXX** Workspace on the left-sided navigation menu.
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image132.png)
-
-1. In the **Warehouse_FabricXX** view, select the **WideWorldImporters** warehouse.
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image133.png)
-
-1. In the **WideWorldImporters** page, under **Explorer** tab, select the **+ Warehouses** button.
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image134.png)
-
-1. In Add warehouses window, select **ShortcutExercise** and click on the **Confirm** button. Both warehouse experiences are added to the query.
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image135.png)
-
-1. Your selected warehouses now show the same **Explorer** pane.
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image136.png)
-
-
-### Task 2: Execute a cross-warehouse query
-
-In this example, you can see how easily you can run T-SQL queries across the WideWorldImporters warehouse and ShortcutExercise SQL Endpoint. You can write cross-database queries using three-part naming to reference the database.schema.table, as in SQL Server.
-
-1. From the **Home** tab of the ribbon, select **New SQL query**.
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image137.png)
-
-1. In the query editor, copy and paste the following T-SQL code. Select the **Run** button to execute the query. After the query is completed, you will see the results.
-
-    ```
-    SELECT Sales.StockItemKey, 
-    Sales.Description, 
-    SUM(CAST(Sales.Quantity AS int)) AS SoldQuantity, 
-    c.Customer
-    FROM [dbo].[fact_sale] AS Sales,
-    [ShortcutExercise].[dbo].[dimension_customer] AS c
-    WHERE Sales.CustomerKey = c.CustomerKey
-    GROUP BY Sales.StockItemKey, Sales.Description, c.Customer;
-    ```
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image138.png)
-
-1. Rename the query for reference. Right-click on **SQL query** in the **Explorer** and select **Rename**.
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image139.png)
-
-1. In the **Rename** dialog box, under the **Name** field, enter +++Cross-warehouse query+++, then click on the **Rename** button.
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image140.png)
-
-
-## Exercise 10: Create Power BI reports
-
-### Task 1: Create a semantic model
-
-In this task we learn how to create and save several types of Power BI reports.
-
-1. In the **WideWorldImportes** page, under the **Home** tab, select the **New semantic model**.
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image141.png)
-
-1. In the **New semantic model** window, in the **Direct Lake semantic model name** box, enter +++Sales Model+++
-
-1. Expand the dbo schema, expand the **Tables** folder, and then check the **dimension_city** and **fact_sale** tables. Select **Confirm**.
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image142.png)
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image143.png)
-
-1. From the left navigation select *+++Warehouse_Fabric@lab.LabInstance.Id+++*, as shown in the image below
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image144.png)
-
-1. To open the semantic model, return to the workspace landing page, and then select the **Sales Model** semantic model.
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image145.png)
-
-1. To open the model designer, on the menu, select **Open data model**.
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image146.png)
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image147.png)
-
-1. On the **Sales Model** page, to edit **Manage Relationships**, change the mode from **Viewing** to **Editing**
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image148.png)
-
-1. To create a relationship, in the model designer, on the **Home** ribbon, select **Manage relationships**.
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image149.png)
-
-1. In the **New relationship window**, complete the following steps to create the relationship:
-
-    1)  In the **From table** dropdown list, select the dimension_city table.
-
-    2)  In the **To table** dropdown list, select the fact_sale table.
-
-    3)  In the **Cardinality** dropdown list, select **One to many (1:\*)**.
-
-    4)  In the **Cross-filter direction** dropdown list, select **Single**.
-
-    5)  Check the **Assume referential integrity** box.
-
-    6)  Select **Save**.
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image150.png)
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image151.png)
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image152.png)
-
-1. In the **Manage relationship** window, select **Close**.
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image153.png)
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image154.png)
-
-
-## Task2: Create a Power BI report
-
-In this task, learn how to create a Power BI report based on the semantic model you created in the  task.
-
-1. On the **File** ribbon, select **Create new report**.
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image155.png)
-
-1. In the report designer, complete the following steps to create a column chart visual:
-
-    1)  In the **Data** pane, expand the **fact_sale** table, and then check the Profit field.
-
-    2)  In the **Data** pane, expand the dimension_city table, and then check the SalesTerritory field.
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image156.png)
-
-1. In the **Visualizations** pane, select the **Azure Map** visual.
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image157.png)
-
-1. In the **Data** pane, from inside the dimension_city table, drag the StateProvince fields to the **Location** well in the **Visualizations** pane.
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image158.png)
-
-1. In the **Data** pane, from inside the fact_sale table, check the Profit field to add it to the map visual **Size** well.
-
-1. In the **Visualizations** pane, select the **Table** visual.
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image159.png)
-
-1. In the **Data** pane, check the following fields:
-
-    1)  SalesTerritory from the dimension_city table
-
-    2)  StateProvince from the dimension_city table
-
-    3)  Profit from the fact_sale table
-
-    4)  TotalExcludingTax from the fact_sale table
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image160.png)
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image161.png)
-
-1. Verify that the completed design of the report page resembles the following image.
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image162.png)
-
-1. To save the report, on the **Home** ribbon, select **File** \> **Save**.
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image163.png)
-
-1. In the Save your report window, in the Enter a name for your report box, enter +++Sales Analysis+++ and Select **Save**
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image164.png)
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image165.png)
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image166.png)
-
-
-### Task 3: Clean up resources
-
-You can delete individual reports, pipelines, warehouses, and other items or remove the entire workspace. In this tutorial, you will clean up the workspace, individual reports, pipelines, warehouses, and other items you created as part of the lab.
-
-1. Select **Warehouse_FabricXX** in the navigation menu to return to the workspace item list.
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image167.png)
-
-1. In the menu of the workspace header, select **Workspace settings**.
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image168.png)
-
-1. In the **Workspace settings** dialog box, select **General** and select the **Remove this workspace**.
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image169.png)
-
-1. In the **Delete workspace?** dialog box, click on the **Delete** button. ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image170.png)
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2005/media/image171.png)
-
-
-## Summary
-
-This comprehensive lab walks through a series of tasks aimed at establishing a functional data environment in Microsoft Fabric. It starts with the creation of a workspace, essential for data operations, and ensures the trial is enabled. Subsequently, a Warehouse named WideWorldImporters is established within the Fabric environment to serve as the central repository for data storage and processing. Data ingestion into the Warehouse_FabricXX workspace is then detailed through the implementation of a Data Factory pipeline. This process involves fetching data from external sources and integrating it seamlessly into the workspace. Critical tables, dimension_city, and fact_sale, are created within the data warehouse to serve as foundational structures for data analysis. The data loading process continues with the use of T-SQL, where data from Azure Blob Storage is transferred into the specified tables. The subsequent tasks delve into the realm of data management and manipulation. Cloning tables is demonstrated, offering a valuable technique for data replication and testing purposes. Additionally, the cloning process is extended to a different schema (dbo1) within the same warehouse, showcasing a structured approach to data organization. The lab progresses to data transformation, introducing the creation of a stored procedure to efficiently aggregate sales data. It then transitions to visual query building, providing an intuitive interface for complex data queries. This is followed by an exploration of notebooks, demonstrating their utility in querying and analyzing data from the dimension_customer table. Multi-warehouse querying capabilities are then unveiled, allowing for seamless data retrieval across various warehouses within the workspace. The lab culminates in enabling Azure Maps visuals integration, enhancing geographical data representation in Power BI. Subsequently, a range of Power BI reports, including column charts, maps, and tables, are created to facilitate in-depth sales data analysis. The final task focuses on generating a report from the OneLake data hub, further emphasizing the versatility of data sources in Fabric. Finally, the lab provides insights into resource management, emphasizing the importance of cleanup procedures to maintain an efficient workspace. Collectively, these tasks present a comprehensive understanding of setting up, managing, and analyzing data within Microsoft Fabric.
+![A screenshot of a computer Description automatically
+generated](./media/image116.png)
