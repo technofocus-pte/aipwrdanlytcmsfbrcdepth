@@ -1,6 +1,6 @@
 <!--
 lab:
-  title: 'Use Case 06: Real-Time Intelligence and Data Warehousing with AbboCost in Microsoft Fabric'
+  title: 'Use Case 06: Identifying and extracting text with Document Intelligence in Microsoft Fabric'
   description: Now that our data is streaming into our KQL database, we can begin to query and explore the data, leveraging KQL to gain insights into the data. A KQL queryset is used to run queries, view, and transform data from a KQL database. Like other artifacts, a KQL queryset exists within the context of a workspace. A queryset can contain multiple queries each stored in a tab. In this exercise, we'll create several KQL queries of increasing complexity to support different business uses.
   duration: 75 minutes
   level: 500
@@ -9,1602 +9,1170 @@ lab:
     - Microsoft Fabric
 -->
 
-# Use Case 06: Real-Time Intelligence and Data Warehousing with AbboCost in Microsoft Fabric
+# Usecase 06: Identifying and extracting text with Document Intelligence in Microsoft Fabric
 
 **Introduction**
 
-In this lab, you will start by rapidly generating real-time data and understanding how that data can be processed and visualized in Microsoft Fabric. With the initial reporting in place, multiple modules are available that explore data warehousing, data lakehouse architecture, data activator, data science, and of course, real-time analytics. The modules are designed to be cohesive but flexible -- they all involve the same core scenario but have limited dependencies so you can consume the modules that make the most sense for you.
+Analyzing structured data has been an easy process for some time but the
+same cannot be said for unstructured data. Unstructured data, such as
+text, images, and videos, is more difficult to analyze and interpret.
+However, with the advent of advanced AI models, such as OpenAI's GPT-5,
+it is now becoming easier to analyze and gain insights from unstructured
+data.
 
-The basic architecture of the solution is illustrated below. The app deployed in the beginning of this lab (either as a docker container or running in Jupyter notebook) will publish events to our Fabric environment. The data is ingested into a KQL database for real-time reporting in Power BI.
+An example of such analysis is the ability to query a document for
+specific information using natural language which is achievable though a
+combination of information retrieval and language generation.
 
-In this lab, you'll get hands-on with a fictitious financial company "AbboCost." AbboCost would like to set up a stock monitoring platform to monitor price fluctuations and report on historical data. Throughout the workshop, we'll look at how every aspect of Microsoft Fabric can be incorporated as part of a larger solution -- by having everything in an integrated solution, you'll be able to quickly and securely integrate data, build reports, create data warehouses and lakehouses, forecast using ML models, and more.
+By leveraging the RAG (Retrieval-Augmented Generation) framework, you
+can create a powerful question-and-answering pipeline that uses a large
+language model (LLM) and you own data to generate responses.
 
-![Data Lakehouse with Azure Synapse Analytics](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image1.png)
+The architecture of such an application is as shown below:
 
-Now that our data is streaming into our KQL database, we can begin to query and explore the data, leveraging KQL to gain insights into the data. A KQL queryset is used to run queries, view, and transform data from a KQL database. Like other artifacts, a KQL queryset exists within the context of a workspace. A queryset can contain multiple queries each stored in a tab. In this exercise, we'll create several KQL queries of increasing complexity to support different business uses.
+![Architecture diagram connecting Azure OpenAI with Azure AI Search and
+Document Intelligence](./media/image1.png)
 
-You will build a Synapse Data Warehouse inside Microsoft Fabric to aggregate data from the KQL database. In Microsoft Fabric, there are two primary ways to build a data warehouse: using a Synapse Data Warehouse, the focus of this module, and a lakehouse.
+**Objective**
 
-A Synapse Data Warehouse stores its data in OneLake in Delta/Parquet format similar to lakehouse tables. However, only Synapse Data Warehouse offers read/write on the T-SQL endpoint. If you are migrating a data warehouse or more familiar with T-SQL development, using a Synapse Data Warehouse is a logical choice.
+- Create a multi-service resource for Azure AI services using Azure
+  portal
 
-### Objectives
+- To create fabric capacity and workspace, Key vault, and fabric
+  workspace
 
-- Redeem Azure Pass, and configure necessary permissions within the
-  Azure portal.  
-- Create fabric workspace.  
-- To deploy the stock generator app via Azure Container Instance using
-  an ARM template.  
-- To configure Eventstream in Microsoft Fabric for ingesting real-time
-  data from Azure Event Hubs, ensuring seamless integration and data preview for subsequent analysis.
-- To create a KQL database within Microsoft Fabric and send data from
-  Eventstream to the  
-- KQL database.  
-- To explore stock price data using KQL, progressively developing
-  queries to analyze trends, calculate price differentials, and visualize data for actionable insights.
-- To leverage Power BI to create dynamic, real-time reports based on
-  analyzed stock data, configuring auto-refresh settings for timely updates and enhancing visualization for informed decision-making.
-- Create a Synapse Data Warehouse within the Fabric workspace and create
-  essential staging and ETL objects to facilitate data processing and transformation.
-- Build a data pipeline for efficiently extracting, transforming, and
-  loading (ETL) data from source systems into the Synapse Data Warehouse, ensuring data accuracy and consistency.
-- Create dimension and fact tables within the data warehouse to organize
-  and store structured data efficiently for analytical purposes.  
-- Implement procedures to incrementally load data into the data
-  warehouse, ensuring efficient handling of large datasets while maintaining data integrity.
-- Create views to support data aggregation during the ETL process,
-  optimizing data processing and improving pipeline performance.  
-- Create semantic model in Synapse Data Warehouse, define table
-  relationships, and generate a Power BI report for data visualization.
+- Pre-process PDF Documents using Azure AI Document Intelligence in
+  Azure AI Services.
 
+- Perform text chunking using SynapseML.
+
+- Generate embeddings for the chunks using SynapseML and Azure OpenAI
+  Services.
+
+- Store the embeddings in Azure AI Search.
+
+- Build a question answering pipeline.
 
 ## Exercise 1: Environment Setup
 
-To follow the lab exercises, a set of resources must be provisioned. At the heart of the scenario is the real-time stock price generator script that generates a continuous stream of stock prices that are used throughout the workshop.
+### Task 1: Create a multi-service resource for Azure AI services
 
-We recommend deploying the stock price generator via Azure Container Instance because the default Spark cluster will consume a large number of resources.
+The multi-service resource is listed under **Azure AI
+services** \> **Azure AI services multi-service account** in the portal.
+To create a multi-service resource, follow these instructions:
 
-### Task 1: Create a Fabric workspace
+1.  Select this link to create a multi-service resource:
 
-In this task, you create a Fabric workspace. The workspace contains all the items needed for this lakehouse tutorial, which includes lakehouse, dataflows, Data Factory pipelines, the notebooks, Power BI datasets, and reports.
++++https://portal.azure.com/#create/Microsoft.CognitiveServicesAllInOne+++
 
-1. Open your browser, navigate to the address bar, and type or paste the following URL: +++https://app.fabric.microsoft.com/+++ then press the **Enter** button.
+[TABLE]
 
-1. In the **Home** page click on **+ New Workspaces** as shown in the below image.
+2.  On the **Create** page, provide the following information:
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image2.png)
+3.  Configure other settings for your resource as needed, read and
+    accept the conditions (as applicable), and then select **Review +
+    create**.
 
-1. In the **Create a workspace** pane that appears on the right side, enter the following details, and click on the **Apply** button.
+![](./media/image2.png)
 
-    |   |  |
-    |-----|----|
-    |Name	|+++RealTimeWorkspace@lab.LabInstance.Id+++|
-    |Advanced	|Select Fabric capacity|
-    |Default storage format|	Small dataset storage format|
+4.  In the **Review+submit** tab, once the Validation is Passed, click
+    on the **Create** button.
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image3.png)
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image3.png)
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image4.png)
+5.  After the deployment is completed, click on the **Go to
+    resource** button.
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image5.png)
+![](./media/image4.png)
 
+6.  In your **Azure** **AI service** window, navigate to the **Resource
+    Management** section, and click on **Keys and Endpoints**.
 
-### Task 2: Deploy the app via Azure Container Instance
+![](./media/image5.png)
 
-This task deploys the stock generator app to an Azure Container Instance using an ARM template. The app will generate stock data that publishes the data to an Azure Event Hub, which is also configured during the deployment of the ARM template.
+7.  In **Keys and Endpoints** page, copy **KEY1, KEY
+    2,** and **Endpoint** values and paste them in a notepad as shown in
+    the below image, then **Save** the notepad to use the information in
+    the upcoming tasks.
 
-To auto-deploy the resources, use these steps below.
+![](./media/image6.png)
 
-1. Open a new address bar and enter the following URL.
+### Task 2: Create an Azure AI Search service in the portal
 
-    >[!Note] If prompted to Sign in, use the tenant credentials found on the Resources tab.
+1.  In Azure portal home page, click on **+ Create Resource**.
 
-    +++https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Ffabricrealtimelab%2Fmain%2Fresources%2Fmodule00%2Ffabricworkshop_arm_managedid.json+++
+![](./media/image7.png)
 
-1. In the **Custom deployment** window, under the **Basics** tab, enter the following details and click on the **Review+create** button.
+2.  In the **Create a resource** page search bar, type **Azure cognitive
+    Search** and click on the appeared **azure AI search**.
 
-    |  |   |
-    |-----|----|
-    |Subscription	| **@lab.CloudSubscription.Name** |
-    |Resource Group	| **@lab.CloudResourceGroup(ResourceGroup1).Name**|
-    |Region | **@lab.CloudResourceGroup(ResourceGroup1).Location** |
+![](./media/image8.png)
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image6.png)
+3.  Click on **azure ai search** section.
 
-1. Once the validation has passed, click **Create**.
+![](./media/image9.png)
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image7.png)
+4.  In the **Azure AI Search** page, click on the **Create** button.
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image8.png)
+5.  On the **Create a search service** page, provide the following
+    information and click on **Review+create** button.
 
-1. After the deployment is completed, click on the **Go to resource** button.
+[TABLE]
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image9.png)
+> ![](./media/image10.png)
+>
+> ![A screenshot of a computer Description automatically
+> generated](./media/image11.png)
+>
+> ![](./media/image12.png)
 
-1. After the deployment has completed, open the resource group and verify the **Event Hub Namespace** and **Azure Container Instance (ACI)** are deployed.
+6.  Once the Validation is passed, click on the **Create** button.
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image10.png)
+![](./media/image13.png)
 
-1. Open the **Event Hub** **namespace**, which will have a name similar to +++ehns-123456-fabricworkshop+++.
+7.  After the deployment is completed, click on the **Go to
+    resource** button.
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image11.png)
+![](./media/image14.png)
 
-1. In **Event Hub namespace** page from the left menu select **Shared access policies** under the **Settings.**
+8.  copy **AI search name** and paste them in a notepad as shown in the
+    below image, then **Save** the notepad to use the information in the
+    upcoming lab.
 
-    ![A screenshot of a web page AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image12.png)
+![](./media/image15.png)
 
-1. In the **Shared access policies** page, click the **stockeventhub_sas** .On the SAS key tab copy the **primary key** and **Event Hub namespace** (such as **ehns-123456-fabricworkshop**) to your notepad as this will be needed shortly. In short, you'll need the following:
+### Task 3: Create a Fabric workspace
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image13.png)
+In this task, you create a Fabric workspace. The workspace contains all
+the items needed for this lakehouse tutorial, which includes lakehouse,
+dataflows, Data Factory pipelines, the notebooks, Power BI datasets, and
+reports.
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image14.png)
+1.  Open your browser, navigate to the address bar, and type or paste
+    the following URL: +++https://app.fabric.microsoft.com/+++ then
+    press the **Enter** button.
 
+![A search engine window with a red box Description automatically
+generated with medium confidence](./media/image16.png)
 
-### Task 3: Get data with Eventstream
+2.  In the **Microsoft Fabric** window, enter your credentials, and
+    click on the **Submit** button.
 
-1. Return to the **Fabric** browser tab and select the **RealTimeWorkspace@lab.LabInstance.Id** icon from the left-side navigation menu.
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image17.png)
 
-1. Create a new Eventhouse by clicking on the **+New item** button in the navigation bar. select **Eventstream**
+3.  Then, In the **Microsoft** window enter the password and click on
+    the **Sign in** button.
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image15.png)
+4.  In **Stay signed in?** window, click on the **Yes** button.
 
-1. Name the Eventstream +++StockEventStream+++, click on the **Create** button.
+5.  In the Workspaces pane Select **+New workspace**.
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image16.png)
+![](./media/image18.png)
 
-1. On the Eventstream, select **Connect data sources**
+6.  In the **Create a workspace** pane that appears on the right side,
+    enter the following details, and click on the **Apply** button.
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image17.png)
+[TABLE]
 
-1. On the Add source, select **Azure Event Hubs** and click on **Connect** button.
+> ![A screenshot of a computer AI-generated content may be
+> incorrect.](./media/image19.png)
+>
+> ![](./media/image20.png)
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image18.png)
+7.  Wait for the deployment to complete. It takes 2-3 minutes to
+    complete.
 
-1. On the **Configure connection settings** configuration page select **New connection** to open the **Connection settings** dialog.
+![](./media/image21.png)
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image19.png)
+### Task 4: Create a lakehouse
 
-1. Enter the following values, then select **Connect**.
+1.  In the **Fabric** **Home** page, select **+New item** and
+    select **Lakehouse** tile.
 
-    | Field | Value |
-    |---|---|
-    | Event Hub namespace | The value that you previously copied to notepad |
-    | Event Hub | +++StockEventHub+++ |
-    | Shared Access Key Name | +++stockeventhub_sas+++ |
-    | Shared Access Key | The value that you previously copied to notepad |
+![](./media/image22.png)
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image20.png)
+2.  In the **New lakehouse** dialog box, enter +++**data_lakehouse**+++
+    in the **Name** field, click on the **Create** button and open the
+    new lakehouse.
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image21.png)
+\[!Note\] Ensure to remove space before **data_lakehouse**.
 
-1. In the **Consumer group** field of the **Configure Azure Event Hub data source** section enter +++$Default+++ .
+![](./media/image23.png)
 
-1. In the **Data format** field of the **Configure Azure Event Hub data source** section select **JSON** and then select **Next**.
+3.  You will see a notification stating **Successfully created SQL
+    endpoint**.
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image22.png)
+![A screenshot of a computer Description automatically
+generated](./media/image24.png)
 
-1. Once all the fields have been properly completed select **Next** to review the configuration and then select the **Add** button to commit your data source.
+![](./media/image25.png)
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image23.png)
+## Exercise 2: Loading and Pre-processing PDF Documents
 
-1. With the Event Hub configured, click on **Data preview**. You should see events including the stock symbol, price, and timestamp.
+### Task 1: Configure Azure API keys
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image25.png)
+To begin, navigate back to the rag_workshop Lakehouse in your workspace
+and create a new notebook by selecting Open Notebook and selecting New
+Notebook from the options.
 
-1. On the Eventstream, select **Publish.**
+1.  From the toolbar, select the **Analyze data** **with** drop-down
+    menu, point to **Notebook**, and then select **New notebook**.
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image26.png)
+> ![](./media/image26.png)
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image27.png)
+2.  In the query editor, paste the following code. Provide the keys for
+    Azure AI Services, Azure Key Vault name and secrets to access the
+    services
 
-1. On the Eventstream, select **new-source** and click on **Refresh** button.
+![](./media/image27.png)
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image28.png)
+\# Azure AI Search
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image29.png)
+AI_SEARCH_NAME = ""
 
+AI_SEARCH_INDEX_NAME = "rag-demo-index"
 
-## Exercise 2: KQL Database Configuration and Ingestion
+AI_SEARCH_API_KEY = ""
 
-Now that our environment is fully configured, we will complete the ingestion of the Eventstream, so that the data is ingested into a KQL database. This data will also be stored in Fabric OneLake.
+\# Azure AI Services
 
-### Task 1: Create KQL Database
+AI_SERVICES_KEY = ""
 
-Kusto Query Language (KQL) is the query language used by Real-Time analytics in Microsoft Fabric along with several other solutions, like Azure Data Explorer, Log Analytics, Microsoft 365 Defender, etc. Similar to Structured Query Language (SQL), KQL is optimized for ad-hoc queries over big data, time series data, and data transformation.
+AI_SERVICES_LOCATION = ""
 
-To work with the data, we'll create a KQL database and stream data from the Eventstream into the KQL DB.
+![](./media/image28.png)
 
-1. In the left-sided navigation menu, navigate and click on **RealTime workspace@lab.LabInstance.Id**, as shown in the below image.
+### Task 2: Loading & Analyzing the Document
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image30.png)
+1.  we will be using a specific document named +++support.pdf+++ which
+    will be the source of our data.
 
-1. In the **Real-Time Intelligence** page, select +**New item** and then filter by, and select, +++Eventhouse+++ to create Eventhouse.
+2.  To download the document, use the **+ Code** icon below the cell
+    output to add a new code cell to the notebook, and enter the
+    following code in it. Click on **▷ Run cell** button and review the
+    output
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image31.png)
+> import requests
+>
+> import os
+>
+> url =
+> "https://github.com/Azure-Samples/azure-openai-rag-workshop/raw/main/data/support.pdf"
+>
+> response = requests.get(url)
+>
+> \# Specify your path here
+>
+> path = "/lakehouse/default/Files/"
+>
+> \# Ensure the directory exists
+>
+> os.makedirs(path, exist_ok=True)
+>
+> \# Write the content to a file in the specified path
+>
+> filename = url.rsplit("/")\[-1\]
+>
+> with open(os.path.join(path, filename), "wb") as f:
+>
+> f.write(response.content)
 
-1. In the **New Eventhouse** dialog box, enter +++StockDB+++ in the **Name** field, click on the **Create** button and open the new Eventhouse.
+![](./media/image29.png)
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image32.png)
+3.  Now, load the PDF document into a Spark DataFrame using the
+    spark.read.format("binaryFile") method provided by Apache Spark
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image33.png)
+4.  Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷
+    Run cell** button and review the output
 
-1. From the **System overview** page, select the **StockDB** database you created in the previous task.
+> from pyspark.sql.functions import udf
+>
+> from pyspark.sql.types import StringType
+>
+> document_path = f"Files/{filename}"
+>
+> df =
+> spark.read.format("binaryFile").load(document_path).select("\_metadata.file_name",
+> "content").limit(10).cache()
+>
+> display(df)
+
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image30.png)
+
+This code will read the PDF document and create a Spark DataFrame named
+df with the contents of the PDF. The DataFrame will have a schema that
+represents the structure of the PDF document, including its textual
+content.
+
+5.  Next, we'll use the Azure AI Document Intelligence to read the PDF
+    documents and extract the text from them.
+
+6.  Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷
+    Run cell** button and review the output.
+
+> from synapse.ml.services import AnalyzeDocument
+>
+> from pyspark.sql.functions import col
+>
+> analyze_document = (
+>
+> AnalyzeDocument()
+>
+> .setPrebuiltModelId("prebuilt-layout")
+>
+> .setSubscriptionKey(AI_SERVICES_KEY)
+>
+> .setLocation(AI_SERVICES_LOCATION)
+>
+> .setImageBytesCol("content")
+>
+> .setOutputCol("result")
+>
+> )
+>
+> analyzed_df = (
+>
+> analyze_document.transform(df)
+>
+> .withColumn("output_content", col("result.analyzeResult.content"))
+>
+> .withColumn("paragraphs", col("result.analyzeResult.paragraphs"))
+>
+> ).cache()
+
+![A screenshot of a computer code AI-generated content may be
+incorrect.](./media/image31.png)
+
+7.  We can observe the analyzed Spark DataFrame named analyzed_df using
+    the following code. Note that we drop the content column as it is
+    not needed anymore.
+
+8.  Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷
+    Run cell** button and review the output
+
+> analyzed_df = analyzed_df.drop("content")
+>
+> display(analyzed_df)
+
+![](./media/image32.png)
+
+## Exercise 3: Generating and Storing Embeddings
+
+### Task 1: Text Chunking
+
+Before we can generate the embeddings, we need to split the text into
+chunks. To do this we leverage SynapseML's PageSplitter to divide the
+documents into smaller sections, which are subsequently stored in the
+chunks column. This allows for more granular representation and
+processing of the document content.
+
+1.  Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷
+    Run cell** button and review the output
+
+> from synapse.ml.featurize.text import PageSplitter
+>
+> ps = (
+>
+> PageSplitter()
+>
+> .setInputCol("output_content")
+>
+> .setMaximumPageLength(4000)
+>
+> .setMinimumPageLength(3000)
+>
+> .setOutputCol("chunks")
+>
+> )
+>
+> splitted_df = ps.transform(analyzed_df)
+>
+> display(splitted_df)
+
+![](./media/image33.png)
+
+\[!Note\] The chunks for each document are presented in a single row
+inside an array. In order to embed all the chunks in the following
+cells, we need to have each chunk in a separate row.
+
+2.  Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷
+    Run cell** button and review the output
+
+> from pyspark.sql.functions import posexplode, col, concat
+>
+> \# Each "chunks" column contains the chunks for a single document in
+> an array
+>
+> \# The posexplode function will separate each chunk into its own row
+>
+> exploded_df = splitted_df.select("file_name",
+> posexplode(col("chunks")).alias("chunk_index", "chunk"))
+>
+> \# Add a unique identifier for each chunk
+>
+> exploded_df = exploded_df.withColumn("unique_id",
+> concat(exploded_df.file_name, exploded_df.chunk_index))
+>
+> display(exploded_df)
+
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image34.png)
+
+\[!Note\] From this code snippet we first explode these arrays so there
+is only one chunk in each row, then filter the Spark DataFrame in order
+to only keep the path to the document and the chunk in a single row.
+
+### Task 2: Generating Embeddings
+
+Next we'll generate the embeddings for each chunk. To do this we utilize
+both SynapseML and Azure OpenAI Service. By integrating the built in
+Azure OpenAI service with SynapseML, we can leverage the power of the
+Apache Spark distributed computing framework to process numerous prompts
+using the OpenAI service.
+
+1.  Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷
+    Run cell** button and review the output
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image34.png)
+> from synapse.ml.services import OpenAIEmbedding
+>
+> embedding = (
+>
+> OpenAIEmbedding()
+>
+> .setDeploymentName("text-embedding-ada-002")
+>
+> .setTextCol("chunk")
+>
+> .setErrorCol("error")
+>
+> .setOutputCol("embeddings")
+>
+> )
+>
+> df_embeddings = embedding.transform(exploded_df)
+>
+> display(df_embeddings)
 
-1. Select **StockDB**, click on the **OneLake availability** as shown in the below image to change the setting and, then click on the **Turn on** Toggle the button enable OneLake access.
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image35.png)
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image35.png)
+\[!Note\] This integration enables the SynapseML embedding client to
+generate embeddings in a distributed manner, enabling efficient
+processing of large volumes of data
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image36.png)
+### Task 3: Storing Embeddings
 
+[Azure AI
+Search](https://learn.microsoft.com/azure/search/search-what-is-azure-search?WT.mc_id=data-114676-jndemenge) is
+a powerful search engine that includes the ability to perform full text
+search, vector search, and hybrid search. For more examples of its
+vector search capabilities, see the [azure-search-vector-samples
+repository](https://github.com/Azure/azure-search-vector-samples/).
 
-### Task 2: Send data from the Eventstream to the KQL database
+Storing data in Azure AI Search involves two main steps:
 
-1. In the left-sided navigation menu, navigate and click on **StockEventStream** created in the previous task, as shown in the below image.
+**Creating the index:** The first step is to define the schema of the
+search index, which includes the properties of each field as well as any
+vector search strategies that will be used.
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image37.png)
+**Adding chunked documents and embeddings:** The second step is to
+upload the chunked documents, along with their corresponding embeddings,
+to the index. This allows for efficient storage and retrieval of the
+data using hybrid and vector search.
 
-1. On the Eventstream, click on the **Edit** button.
+1.  The following code snippet demonstrates how to create an index in
+    Azure AI Search using the Azure AI Search REST API. This code
+    creates an index with fields for the unique identifier of each
+    document, the text content of the document, and the vector embedding
+    of the text content.
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image38.png)
+2.  Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷
+    Run cell** button and review the output
 
-1. Our data should be arriving into our Eventstream, and we'll now configure the data to be ingested into the KQL database that we created in the previous task. On the Eventstream, click on **Transform events or add destination**, then navigate and select **Eventhouse**.
+import requests
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image39.png)
+import json
 
-1. On the KQL settings, select **Direct ingestion**. While we have the opportunity to process event data at this stage, for our purposes, we will ingest the data directly into the KQL database. Set the destination name to +++KQL+++, then select your **workspace, Eventhouse** and KQL database created in the above task, then click on **Save** button.
+\# Length of the embedding vector (OpenAI ada-002 generates embeddings
+of length 1536)
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image40.png)
+EMBEDDING_LENGTH = 1536
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image41.png)
+\# Build the correct Azure AI Search endpoint URL using the configured
+service name
 
-1. On the Eventstream, select **Publish.**
+\# NOTE: The search endpoint is usually:
+https://\<search-service-name\>.search.windows.net
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image42.png)
+endpoint = f"https://{AI_SEARCH_NAME}.search.windows.net"
 
-1. On the Eventstream pane, select **configure** in the **KQL** destination.
+\# Create index for AI Search with fields id, content, and contentVector
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image43.png)
+url =
+f"{endpoint}/indexes/{AI_SEARCH_INDEX_NAME}?api-version=2024-07-01"
 
-1. On the first settings page, select **+New table** and enter the name +++StockPrice+++ for the table to hold the data in StockDB. Click on the **Next** button.
+payload = json.dumps(
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image44.png)
+    {
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image45.png)
+        "name": AI_SEARCH_INDEX_NAME,
 
-1. The next page allows us to inspect and configure the schema. Be sure to change the format from TXT to **JSON**, if necessary. The default columns of *symbol*, *price*, and *timestamp* should be formatted as shown in the below image; then click on the **Finish** button.
+        "fields": \[
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image46.png)
+            {
 
-1. On the **Summary** page, if there are no errors, you'll see a **green checkmark** as shown in the below image, then click on the **Close** button to complete the configuration.
+                "name": "id",
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image47.png)
+                "type": "Edm.String",
 
-1. Select the **KQL** destination and click on the **Refresh** button.
+                "key": True,
 
-    >[!Note] It may take a few minutes to display the data in the preview.
+                "filterable": True,
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image48.png)
+            },
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image49.png)
+            {
 
+                "name": "content",
 
-## Exercise 3: Exploring the Data
+                "type": "Edm.String",
 
-In this exercise, you'll create several KQL queries of increasing complexity to support different business uses.
+                "searchable": True,
 
-### Task 1: Create KQL queryset: StockQueryset
+                "retrievable": True,
 
-1. Click on **RealTimeWorkspace@lab.LbInstance.Id** on the left-sided navigation pane.
+            },
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image50.png)
+            {
 
-1. From your workspace, click on **+ New item** then filter by, and select, +++KQL Queryset+++ as shown in the below image. In the **New KQL Queryset** dialog box, enter +++StockQueryset+++, then click on the **Create** button.
+                "name": "contentVector",
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image51.png)
+                "type": "Collection(Edm.Single)",
 
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image52.png)
+                "searchable": True,
 
-1. In StockQueryset page select **Eventhouse/KQL Database**
+                "retrievable": True,
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image53.png)
+                "dimensions": EMBEDDING_LENGTH,
 
-1. Select the **StockDB** row and click on the **Connect** button.
+                "vectorSearchProfile": "vectorConfig",
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image54.png)
+            },
 
-    >[!Note] The KQL query window will open, allowing you to query the data.
+        \],
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image55.png)
+        "vectorSearch": {
 
-    >[!Note] The default query code will look like the code shown in the below
-    > image; it contains 3 distinct KQL queries. You may
-    > see *YOUR_TABLE_HERE* instead of the **StockPrice** table. Select
-    > and delete them.
+            "algorithms": \[
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image55.png)
+                {
 
-1. In the query editor, copy and paste the following code replacing the sample code. Select the entire text and click on the **Run** button to execute the query. After the query is executed, you will see the results.
+                    "name": "hnswConfig",
 
-    ```
-    // Use "take" to view a sample number of records in the table and check the data.
-    StockPrice
-    | take 100;
-    
-    // See how many records are in the table.
-    StockPrice
-    | count;
-    
-    // This query returns the number of ingestions per hour in the given table.
-    StockPrice
-    | summarize IngestionCount = count() by bin(ingestion_time(), 1h);
-    ```
+                    "kind": "hnsw",
 
-    >[!Note]To run a single query when there are multiple queries in the
-    > editor, you can highlight the query text or place your cursor so the
-    > cursor is in the context of the query (for example, at the beginning or
-    > end of the query) -- the current query should highlight in blue. To run
-    > the query, click Run in the toolbar. If you'd like to run all 3 to
-    > display the results in 3 different tables, each query will need to have
-    > a semicolon (;) after the statement, as shown below.*
+                    "hnswParameters": {"metric": "cosine"},
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image56.png)
+                }
 
-1. The results will be displayed in 3 different tables as shown in the below image. Click on each table tab to review the data.
+            \],
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image57.png)
+            "profiles": \[
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image58.png)
+                {"name": "vectorConfig", "algorithm": "hnswConfig"}
 
-    ![A screenshot of a chat AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image59.png)
+            \],
 
+        },
 
-### Task 2: New Query of StockByTime
+    }
 
-1. Create a new tab within the queryset by clicking on the **+** icon as shown in the below image. Rename this tab as +++StockByTime+++
+)
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image60.png)
+headers = {"Content-Type": "application/json", "api-key":
+AI_SEARCH_API_KEY}
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image61.png)
+try:
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image62.png)
+    response = requests.put(url, headers=headers, data=payload,
+timeout=30)
 
-    >[!Knowledge] We can begin to add our own calculations, such as calculating the
-    >change over time. For example,
-    >the [prev()](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/prevfunction) function,
-    >a type of windowing function, allows us to look at values from
-    >previous rows; we can use this to calculate the change in price. In
-    >addition, as the previous price values are stock symbol specific, we
-    >can [partition](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/partition-operator) the
-    >data when making calculations.
+    if response.status_code == 201:
 
-1. In the query editor, copy and paste the following code. Click on the **Run** button to execute the query. After the query is executed, you will see the results.
+        print("Index created!")
 
-    ```
-    StockPrice
-    | where timestamp > ago(75m)
-    | project symbol, price, timestamp
-    | partition by symbol
-    (
-        order by timestamp asc
-        | extend prev_price = prev(price, 1)
-        | extend prev_price_10min = prev(price, 600)
-    )
-    | where timestamp > ago(60m)
-    | order by timestamp asc, symbol asc
-    | extend pricedifference_10min = round(price - prev_price_10min, 2)
-    | extend percentdifference_10min = round(round(price - prev_price_10min, 2) / prev_price_10min, 4)
-    | order by timestamp asc, symbol asc
-    ```
+    elif response.status_code == 204:
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image63.png)
+        print("Index updated!")
 
-    In this KQL query, the results are first limited to the most recent 75 minutes. While we ultimately limit the rows to the last 60 minutes, our initial dataset needs enough data to lookup previous values. The data is then partitioned to group the data by symbol, and we look at the previous price (from 1 second ago) as well as the previous price from 10 minutes ago. Note that this query assumes data is generated at 1 second intervals. For the purposes of our data, subtle fluctuations are acceptable. However, if you need precision in these calculations (such as exactly 10 minutes ago and not 9:59 or 10:01), you'd need to approach this differently.
+    else:
 
+        print(f"HTTP request failed with status code
+{response.status_code}")
 
-### Task 3: StockAggregate
+        print(f"HTTP response body: {response.text}")
 
-1. Create another new tab within the queryset by clicking on the **+** icon as shown in the below image. Rename this tab as +++StockAggregate+++
+except requests.exceptions.RequestException as e:
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image64.png)
+    \# This will catch DNS errors, timeouts, etc.
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image65.png)
+    print("Failed to connect to Azure AI Search endpoint.")
 
-    >[!Note]This query will find the biggest price gains over a 10-minute period
+    print(f"Endpoint URL: {url}")
 
-    ```
-    for each stock, and the time it occurred. This query uses
-    the [summarize](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/summarizeoperator) operator,
-    which produces a table that aggregates the input table into groups
-    based on the specified parameters (in this case, *symbol*),
-    while [arg_max](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/arg-max-aggregation-function) returns
-    the greatest value.
-    ```
+    print(f"Error details: {e}")
 
-1. In the query editor, copy and paste the following code. Click on the **Run** button to execute the query. After the query is executed, you will see the results.
+    print(
 
-    ```
-    StockPrice
-    | project symbol, price, timestamp
-    | partition by symbol
-    (
-        order by timestamp asc
-        | extend prev_price = prev(price, 1)
-        | extend prev_price_10min = prev(price, 600)
-    )
-    | order by timestamp asc, symbol asc
-    | extend pricedifference_10min = round(price - prev_price_10min, 2)
-    | extend percentdifference_10min = round(round(price - prev_price_10min, 2) / prev_price_10min, 4)
-    | order by timestamp asc, symbol asc
-    | summarize arg_max(pricedifference_10min, *) by symbol
-    ```
+        "Please verify that:\n"
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image66.png)
+        " - AI_SEARCH_NAME is correct,\n"
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image67.png)
+        " - The search service exists in your subscription, and\n"
 
+        " - This environment has network access to the service."
 
-### Task 4: StockBinned
+    )
 
-1. Create another new tab within the queryset by clicking on the **+ icon** as shown in the below image. Rename this tab as +++StockBinned+++
+![](./media/image36.png)
 
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image68.png)
+![](./media/image37.png)
 
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image69.png)
+3.  The next step is to upload the chunks to the newly created Azure AI
+    Search index. The Azure AI Search REST API supports up to 1000
+    "documents" per request. Note that in this case, each of our
+    "documents" is in fact a chunk of the original file
 
-    >[!Knowledge]KQL also has a [bin()
-    >function](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/bin-function),
-    >which can be used to bucket results based on the bin parameter. In
-    >this case, by specifying a timestamp of 1 hour, the result is
-    >aggregated for each hour. The time period can be set to minute,
-    >hour, day, and so on.
+4.  Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷
+    Run cell** button and review the output
 
-1. In the query editor, copy and paste the following code. Click on the **Run** button to execute the query. After the query is executed, you will see the results.
-
-    ```
-    StockPrice
-    | summarize avg(price), min(price), max(price) by bin(timestamp, 1h), symbol
-    | sort by timestamp asc, symbol asc
-    ```
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image70.png)
-
-    This is particularly useful when creating reports that aggregate real-time data over a longer time period.
-
-
-### Task 5: Visualizations
-
-1. Create a final new tab within the queryset by clicking on the **+** icon as shown in the below image. Rename this tab as +++Visualizations+++. We'll use this tab to explore visualizing data.
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image71.png)
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image72.png)
-
-    >[!Knowledge]KQL supports a large number of visualizations by using
-    >the *render* operator. Run the below query, which is the same as the
-    >StockByTime query, but with an additional *render* operation added:
-
-1. In the query editor, copy and paste the following code. Click on the **Run** button to execute the query. After the query is executed, you will see the results.
-
-    ```
-    StockPrice
-    | where timestamp > ago(75m)
-    | project symbol, price, timestamp
-    | partition by symbol
-    (
-        order by timestamp asc
-        | extend prev_price = prev(price, 1)
-        | extend prev_price_10min = prev(price, 600)
-    )
-    | where timestamp > ago(60m)
-    | order by timestamp asc, symbol asc
-    | extend pricedifference_10min = round(price - prev_price_10min, 2)
-    | extend percentdifference_10min = round(round(price - prev_price_10min, 2) / prev_price_10min, 4)
-    | order by timestamp asc, symbol asc
-    | render linechart with (series=symbol, xcolumn=timestamp, ycolumns=price)
-    ```
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image73.png)
-
-1. This will render a line chart as shown in the below image.
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image74.png)
-
-
-## Exercise 4: Optimizing Power BI Reporting Efficiency
-
-With the data loaded in the database and our initial KQL queryset complete, we can begin to craft visualizations for real-time dashboards.
-
-### Task 1: Configuring Refresh Rate
-
-Our Power BI tenant needs to be configured to allow for more frequent updating.
-
-1. To configure this setting, navigate to the Power BI admin portal by clicking on the **Settings** icon in the upper right corner of the **Fabric portal**. Navigate to Governance and insights section, then click on **Admin portal**.
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image75.png)
-
-1. Select **Capacity settings** on the left, and select the **Fabric Capacity** that matches your current environment. Select **Fabric capacity** name
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image76.png)
-
-1. On the following screen, scroll down to the **Power BI workloads** section, and under **Semantic Models** (recently renamed from **Datasets**), configure **Automatic page refresh** to **On**, with a **minimum refresh interval** of **1** second. Click **Apply**.
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image77.png)
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image78.png)
-
-1. In caseUpdate your capacity workloads dialog box appears, then click on the **Yes** button.
-
-    ![A white background with black text Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image79.png)
-
-
-### Task 2: Creating a basic Power BI report
-
-1. In the **Microsoft Fabric** page menu bar on the left side, select **StockQueryset**.
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image80.png)
-
-1. From the **StockQueryset** queryset used in the previous module, select the **StockByTime** query tab.
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image81.png)
-
-1. Select the query and run to view the results. Click on the **Create Power BI report** button in the command bar to bring this query into Power BI.
-
-    >[!Note] The **Create Power BI report** may be accessible under the **More...** button if you do not see it on the command bar.
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image82.png)
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image83.png)
-
-1. On the report preview page, we can configure our initial chart, select a **line chart** to the design surface, and configure the report as follows. See the image below as a reference.
-
-    - Legend: **symbol**
-    - X-axis: **timestamp**
-    - Y-axis: **price**
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image84.png)
-
-
-1. In the Power BI (preview) page, from the ribbon, click on **File** and select **Save**.
-
-    ![A screenshot of a graph Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image85.png)
-
-1. On **Just a few details first** dialog box, in **Name your file in Power BI** field, enter +++RealTimeStocks+++. In **Save it to a workspace** field, click on the dropdown and select **RealTimeWorkspace@lab.LabInstance.Id**. Then, click on the **Continue** button.
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image86.png)
-
-1. In the Power BI (preview) page, click on **Open the file in Power BI to view, edit and get a shareable link.**
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image87.png)
-
-1. On the **RealTimeStocks** page, click on the **Edit** button in the command bar to open the report editor.
-
-    ![A graph of different colored lines Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image88.png)
-
-1. Select the line chart on the report. Configure a **Filter** for **timestamp** to display data for the last 5 minutes using these settings:
-
-    - Filter type: Relative time
-    - Show items when the value: is in the last 5 minutes
-
-
-1. Click on **Apply filter** to enable the filter. You will see a similar type of output as shown in the below image.
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image89.png)
-
-
-### Task 3: Creating a second visual for percent change
-
-1. Create a second line chart, under **Visualizations**, select **Line chart**.
-
-1. Instead of plotting the current stock price, select the **percentdifference_10min** value, which is a positive or negative value based off the difference between the current price and the value of the price from 10 minutes ago. Use these values for the chart:
-
-    - Legend: **symbol**
-    - X-axis: **timestamp**
-    - Y-axis: **average of percentdifference_10min**
-  
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image90.png)
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image91.png)
-
-
-1. Under the **Visualization,** select the **Analytics** represented by a magnifier-like icon as shown in the below image, then click on **Y-Axis Constant Line(1).** In the **Apply settings to** section,  click on **+Add line**, then enter **Value 0.**
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image92.png)
-
-1. Select the line chart on the report. Configure a **Filter** for **timestamp** to display data for the last 5 minutes using these settings:
-
-    - Filter type: Relative time
-    - Show items when the value: is in the last 5 minutes
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image93.png)
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image94.png)
-
-
-### Task 4: Configuring the report to auto-refresh
-
-1. Deselect the chart. On the **Visualizations settings** \> **Format page**, enable **Page refresh** to automatically refresh every second or two, based on your preference. Of course, realistically we need to balance the performance implications of refresh frequency, user demand, and system resources.
-
-1. Click on **Format your report** **page** icon, navigate and click on **Page refresh**. Turn on the toggle. Set the Auto page refresh value as **2 Seconds** as shown in the below image.
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image95.png)
-
-1. In the Power BI (preview) page, from the ribbon, click on **File** and select **Save**.
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image96.png)
-
-
-## Exercise 5: Setup Warehouse and Pipeline
-
-### Task 1: Create a Synapse Data Warehouse in the Fabric workspace
-
-To get started, we'll first create the Synapse Data Warehouse in our workspace.
-
-1. In the **Fabric Home** page, select **RealTimeWorkspace@lab.LabInstance.Id** from the left-side menu, then select **+New item** and filter by, and select, the +++Warehouse+++ tile.
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image97.png)
-
-1. On the **New warehouse** dialog box, enter +++StocksDW+++ as the name and click on the **Create** button.
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image98.png)
-
-    >[!Note] The warehouse is largely empty.
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image99.png)
-
-1. Click on **New SQL query** dropdown in the command bar, then select **New SQL query**. We'll start building our schema in the next task.
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image100.png)
-
-
-### Task 2: Create the staging and ETL objects
-
-In this task you will run a query that creates the staging tables that will hold the data during the ETL (Extract, Transform, and Load) process. This will also create the two schemas used -- *stg* and *ETL*; schemas help group workloads by type or function. The *stg* schema is for staging and contains intermediate tables for the ETL process. The *ETL* schema contains queries used for data movement, as well as a single table for tracking state.
-
->[!Note] The begin date for the watermark is arbitrarily chosen as
->some previous date (1/1/2022), ensuring all data is captured -- this
->date will be updated on each successful run.
-
-1. In the query editor, copy and paste the following code. Click on the **Run** button to execute the query. After the query is executed, you will see the results.
-
-    ```
-     1 - Create Staging and ETL.sql 
-    
-    -- STAGING TABLES
-    CREATE SCHEMA stg
-    GO
-    
-    CREATE TABLE stg.StocksPrices
-    (
-       symbol VARCHAR(5) NOT NULL
-       ,timestamp VARCHAR(30) NOT NULL
-       ,price FLOAT NOT NULL
-       ,datestamp VARCHAR(12) NOT NULL
-    )
-    GO
-    
-    -- ETL TABLES
-    CREATE SCHEMA ETL
-    GO
-    CREATE TABLE ETL.IngestSourceInfo
-    (
-        ObjectName VARCHAR(50) NOT NULL
-        ,WaterMark DATETIME2(6)
-        ,IsActiveFlag VARCHAR(1)
-    )
-    
-    INSERT [ETL].[IngestSourceInfo]
-    SELECT 'StocksPrices', '1/1/2022 23:59:59', 'Y'
-    ```
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image101.png)
-  
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image102.png)
-
-1. Rename the query for reference. Right-click on **SQL query 1** in **Explorer** and select **Rename**.
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image103.png)
-
-1. In the **Rename** dialog box, under the **Name** field, enter `Create stocks and metadata`, then click on the **Rename** button.
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image104.png)
-
-1. Click on **New SQL query** dropdown in the command bar, then select **New SQL query**. We'll start building our schema in the next step:
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image105.png)
-
-    >[!Note] The **sp_IngestSourceInfo_Update** procedure updates the watermark;
-    >this ensures we are keeping track of which records have already been
-    >imported
-
-1. In the query editor, copy and paste the following code. Click on the **Run** button to execute the query. After the query is executed, you will see the results.
-
-    ```
-     1 - Create Staging and ETL.sql 
-    
-    CREATE PROC [ETL].[sp_IngestSourceInfo_Update]
-    @ObjectName VARCHAR(50)
-    ,@WaterMark DATETIME2(6)
-    AS
-    BEGIN
-    
-    UPDATE [ETL].[IngestSourceInfo]
-        SET WaterMark = @WaterMark
-    WHERE 
-        ObjectName  = @ObjectName
-    
-    END
-    
-    GO
-    ```
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image106.png)
-  
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image107.png)
-
-1. Rename the query for reference later. Right-click on **SQL query 1** in **Explorer** and select **Rename**.
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image108.png)
-
-1. In the **Rename** dialog box, under the **Name** field, enter +++ETL.sql_IngestSource+++, then click on the **Rename** button.
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image109.png)
-
-    This should look similar to:
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image110.png)
-
-
-### Task 3: Create the data pipeline
-
-1. On the **StockDW** page, click on **RealTimeWorkspace@lab.LabInstance.Id** Workspace on the left-sided navigation menu.
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image111.png)
-
-1. On the **RealTimeWorkspace@lab.LabInstance.Id** home page select **+New item**, then select **Data pipeline.**
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image112.png)
-
-1. A **New pipeline** dialog box will appear, in the **Name** field, enter +++PL_Refresh_DWH+++ and click on the **Create** button.
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image113.png)
-
-1. In the **PL_Refresh_DWH** page, navigate to **Build a data pipeline to organize and move your data** section and click on **Pipeline activity**.
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image114.png)
-
-1. Then, navigate and select **Lookup** activity as shown in the below image.
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image115.png)
-
-1. On the **General** tab, in the **Name field,** enter +++Get WaterMark+++
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image116.png)
-
-1. Click on the **Settings** tab, enter the following details as shown in the below image.
-
-    |   |   |
-    |---|---|
-    |Connection	|Click on the dropdown and select StocksDW from the list.|
-    |Use query	|Query|
-    |Query |	`SELECT * FROM [ETL].[IngestSourceInfo] WHERE IsActiveFlag = 'Y'`|
-    |First row only |	unchecked.|
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image117.png)
-
-
-### Task 4: Build ForEach activity
-
-This task focuses on building multiple activities within a single ForEach activity. The ForEach activity is a container that executes child activities as a group: in this case, if we had multiple sources to pull data from, we'd repeat these steps for each data source.
-
-1. In the **Lookup - Get WaterMark** box, navigate and click on the right arrow to **Add an activity**. Then, navigate and select **ForEach** activity as shown in the below image.
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image118.png)
-
-1. Click on the **Settings** tab, enter the items as
-
-    +++@activity('GetWaterMark').output.value+++
-
-    >This should look similar to the below image:
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image119.png)
-
-1. In the *ForEach*  box, click on the plus (+) symbol to add a new activity.
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image120.png)
-
-1. Select and add a **Copy Data** activity within **ForEach.**
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image121.png)
-
-1. Select **Copy data1** Activity icon, on the **General** tab, in the **Name field,** enter `Copy KQL`
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image122.png)
-
-1. Click on the **Source** tab, enter the following settings.
-
-    |  |  |
-    |---|----|
-    |Connection |	Select StocksDB from the dropdown.|
-    |Use query|	Query|
-    |Query |	+++@concat('StockPrice<br> \| where todatetime(timestamp) >= todatetime(''', item().WaterMark,''')<br> \| order by timestamp asc<br> \| extend datestamp = substring(timestamp,0,10)<br> \| project symbol, timestamp, price, datestamp<br> \| take 500000<br> \| where not(isnull(price))<br>' )+++|
-
-    > The **Source** tab of the activity should look similar to:
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image123.png)
-
-1. Click on the **Destination** tab, enter the following settings
-
-    |   |   |
-    |----|----|
-    |Connection	|drop down select StocksDW from the list|
-    |Table option|	Use existing|
-    |Table |	+++stg.StocksPrices+++|
-
-    - Under the *Advanced* section, enter the following **Pre-copy
-    script** to truncate the table before loading the staging table:
-
-    `delete stg.StocksPrices`
-
-    >[!Note] This step first deletes old data from the staging table, and then copies
-    > the data from the KQL table, selecting data from the last watermark and
-    > inserting it into the staging table. Using a watermark is important to
-    > avoid processing the entire table; additionally, KQL queries have a
-    > maximum rowcount of 500,000 rows. Given the current rate of data
-    > ingested, this equates to about 3/4 of one day.
-
-    > The **Destination** tab of the activity should look like:
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image124.png)
-
-
-1. In the *ForEach*  box, click on the plus **(+)** symbol, navigate and select **Lookup** activity.
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image125.png)
-
-1. Click on **Lookup1** icon, in the **General** tab, **Name field,** enter +++Get New WaterMark+++
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image126.png)
-
-1. Click on the **Settings** tab, enter the following settings
-
-    |  |  |
-    |----|----|
-    |Connection|	drop down, select StocksDW from the list|
-    |Use query|	Query|
-    |Query	|+++@concat('Select Max(timestamp) as WaterMark from stg.', item().ObjectName)+++|
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image127.png)
-
-1. In the *ForEach* box, click on the plus **(+)** symbol, navigate and select **Stored Procedure**  activity.
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image128.png)
-
-1. Click on the **Stored procedure** icon. On the **General** tab, in the **Name field,** enter `Update WaterMark`
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image129.png)
-
-1. Click on the **Settings** tab, enter the following settings.
-
-    |  |  |
-    |-----|----|
-    |Connection| 	StocksDW|
-    |Stored procedure name| 	+++ETL.sp_IngestSourceInfo_Update+++|
-
-    - Parameters (click *Import* to automatically add the parameter names):
-
-    |  |  |  |
-    |----|---|---|
-    |Name|	Type	|Value|
-    |ObjectName	|String|	+++@item().ObjectName+++|
-    |WaterMark	|DateTime|	+++@activity('Get New WaterMark').output.firstRow.WaterMark+++|
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image130.png)
-
-
-### Task 5: Test the Pipeline
-
-1. From the **Home** tab in the pipeline, select **Run**.
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image131.png)
-
-1. In the **Save and run?** dialog box, click on **Save and run** button
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image132.png)
-
-    >[!Knowledge]This will prompt to first save the pipeline, and then validate to
-    >find any configuration errors. This initial run will take a few
-    >moments and will copy the data into the staging table.
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image133.png)
-
-1. On the **PL_Refresh_DWH** page, click on the **StocksDW - RealTimeWorkspace@lab.LabInstance.Id** on the left-sided navigation menu.
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image134.png)
-
-1. Click on the **Refresh** button for the browser.
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image135.png)
-
-1. In the data warehouse, data should be visible in the staging table. Within the data warehouse, selecting a table will show a preview of the data in the table. Expand the **Schemas** in Explorer, then navigate to, and click on, **stg** \> **Tables** \> **StocksPrices** as shown in the below image.
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image136.png)
-
-1. Click on **New SQL query** dropdown in the command bar, then select **New SQL query**. We'll start building our schema in the next step:
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image137.png)
-
-    >[!Knowledge]While we're in the data warehouse, run the script below in new SQL
-    >query window to reset the ingestion process. It's often handy in
-    >development to have a reset script to allow for incremental testing.
-    >This will reset the date and delete the data from the staging table.
-
-    >[!Note]We haven't created the fact or dimensions table yet, but
-    > the script should still work.
-
-1. In the query editor, copy and paste the following code. Click on the **Run** button to execute the query. After the query is executed, you will see the results.
-
-    ```
-    -- Run this to 'RESET' the ingestion tables
-    
-    exec ETL.sp_IngestSourceInfo_Update 'StocksPrices', '2022-01-01 23:59:59.000000'
-    GO
-    
-    IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES 
-        WHERE TABLE_SCHEMA = 'stg' AND TABLE_NAME = 'StocksPrices'))
-    BEGIN
-        delete stg.StocksPrices
-    END
-    GO
-    
-    IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES 
-        WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'fact_Stocks_Daily_Prices'))
-    BEGIN
-        delete dbo.fact_Stocks_Daily_Prices
-    END
-    GO
-    
-    IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES 
-        WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'dim_Symbol'))
-    BEGIN
-        delete dbo.dim_Symbol
-    END
-    GO
-    ```
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image138.png)
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image139.png)
-
-
-## Exercise 6: Build Star Schema
-
-For the date dimension, we'll load enough values for the foreseeable future. Date dimensions are fairly similar across all implementations and typically hold specific date details: the day of week, month, quarter, etc.
-
-For the symbol dimension, we'll incrementally load that during the pipeline -- this way, if new stocks are added at some point, they will get added to the Symbol dimension table during the execution of the pipeline. The symbol dimension holds additional details about each symbol, such as company name, the stock market it trades on, etc.
-
-We'll also create views to support the pipeline by making it easier to load data from the staging table by aggregating the min, max, and closing price of the stock.
-
-### Task 1: Create the dimension and fact tables
-
-1. Click on  **New SQL query**  dropdown in the command bar, then select **New SQL query**. We'll start building our schema in the next step.
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image137.png)
-
-    >[!Knowledge]In our data warehouse, run the following SQL to create the fact and
-    >dimension tables. As in the previous step, you can run this ad-hoc
-    >or create a SQL query to save the query for future use.
-
-1. In the query editor, copy and paste the following code. Click on the **Run** button to execute the query. After the query is executed, you will see the results.
-
-    ```
-    2 - Create Dimension and Fact tables.sql 
-    
-    -- Dimensions and Facts (dbo)
-    CREATE TABLE dbo.fact_Stocks_Daily_Prices
-    (
-       Symbol_SK INT NOT NULL
-       ,PriceDateKey DATE NOT NULL
-       ,MinPrice FLOAT NOT NULL
-       ,MaxPrice FLOAT NOT NULL
-       ,ClosePrice FLOAT NOT NULL
-    )
-    GO
-    
-    CREATE TABLE dbo.dim_Symbol
-    (
-        Symbol_SK INT NOT NULL
-        ,Symbol VARCHAR(5) NOT NULL
-        ,Name VARCHAR(25)
-        ,Market VARCHAR(15)
-    )
-    GO
-    
-    CREATE TABLE dbo.dim_Date 
-    (
-        [DateKey] DATE NOT NULL
-        ,[DayOfMonth] int
-        ,[DayOfWeeK] int
-        ,[DayOfWeekName] varchar(25)
-        ,[Year] int
-        ,[Month] int
-        ,[MonthName] varchar(25)
-        ,[Quarter] int
-        ,[QuarterName] varchar(2)
-    )
-    GO
-    ```
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image140.png)
-  
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image141.png)
-
-1. Rename the query for reference. Right-click on **SQL query** in Explorer and select **Rename**.
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image142.png)
-
-1. In the **Rename** dialog box, under the **Name** field, enter `Create Dimension and Fact tables`, then click on the **Rename** button.
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image143.png)
-
-
-### Task 2: Load the date dimension
-
-1. Click **New SQL query** at the top of the window. Click on **New SQL query** dropdown in the command bar, then select **New SQL query**. We'll start building our schema in the next step:
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image144.png)
-
-    >[!Knowledge]The date dimension is differentiated; it can be loaded once with all
-    >the values we'd need. Run the following script, which creates a
-    >procedure to populate the date dimension table with a broad range of
-    >values.
-
-1. In the query editor, copy and paste the following code. Click on the **Run** button to execute the query. After the query is executed, you will see the results.
-
-    ```
-    3 - Load Dimension tables.sql 
-    
-    CREATE PROC [ETL].[sp_Dim_Date_Load]
-    @BeginDate DATE = NULL
-    ,@EndDate DATE = NULL
-    AS
-    BEGIN
-    
-    SET @BeginDate = ISNULL(@BeginDate, '2022-01-01')
-    SET @EndDate = ISNULL(@EndDate, DATEADD(year, 2, GETDATE()))
-    
-    DECLARE @N AS INT = 0
-    DECLARE @NumberOfDates INT = DATEDIFF(day,@BeginDate, @EndDate)
-    DECLARE @SQL AS NVARCHAR(MAX)
-    DECLARE @STR AS VARCHAR(MAX) = ''
-    
-    WHILE @N <= @NumberOfDates
-        BEGIN
-        SET @STR = @STR + CAST(DATEADD(day,@N,@BeginDate) AS VARCHAR(10)) 
-        
-        IF @N < @NumberOfDates
-            BEGIN
-                SET @STR = @STR + ','
-            END
-    
-        SET @N = @N + 1;
-        END
-    
-    SET @SQL = 'INSERT INTO dbo.dim_Date ([DateKey]) SELECT CAST([value] AS DATE) FROM STRING_SPLIT(@STR, '','')';
-    
-    EXEC sys.sp_executesql @SQL, N'@STR NVARCHAR(MAX)', @STR;
-    
-    UPDATE dbo.dim_Date
-    SET 
-        [DayOfMonth] = DATEPART(day,DateKey)
-        ,[DayOfWeeK] = DATEPART(dw,DateKey)
-        ,[DayOfWeekName] = DATENAME(weekday, DateKey)
-        ,[Year] = DATEPART(yyyy,DateKey)
-        ,[Month] = DATEPART(month,DateKey)
-        ,[MonthName] = DATENAME(month, DateKey)
-        ,[Quarter] = DATEPART(quarter,DateKey)
-        ,[QuarterName] = CONCAT('Q',DATEPART(quarter,DateKey))
-    
-    END
-    GO
-    ```
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image145.png)
-  
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image146.png)
-
-1. From same query window, execute the above procedure by running the following script.
-
-    ```
-    3 - Load Dimension tables.sql 
-    Exec ETL.sp_Dim_Date_Load
-    ```
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image147.png)
-  
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image148.png)
-
-1. Rename the query for reference. Right-click on **SQL query** in Explorer and select **Rename**.
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image149.png)
-
-1. In the **Rename** dialog box, under the **Name** field, enter +++Load Dimension tables+++, then click on the **Rename** button.
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image150.png)
-
-
-### Task 3: Create the procedure to load the Symbol dimension
-
-1. Click on **New SQL query** dropdown in the command bar, then select **New SQL query**. We'll start building our schema in the next step.
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image144.png)
-
-    >[!Knowledge]Similar to the date dimension, each stock symbol corresponds to a
-    >row in the Symbols dimension table. This table holds details of the
-    >stock, such as company name, and the market the stock is listed
-    >with.
-
-1. In the query editor, copy and paste the following code. Click on the **Run** button to execute the query. This will create the procedure that will load the stock symbol dimension. We'll execute this in the pipeline to handle any new stocks that might enter the feed.
-
-    ```
-    3 - Load Dimension tables.sql 
-    
-    CREATE PROC [ETL].[sp_Dim_Symbol_Load]
-    AS
-    BEGIN
-    
-    DECLARE @MaxSK INT = (SELECT ISNULL(MAX(Symbol_SK),0) FROM [dbo].[dim_Symbol])
-    
-    INSERT [dbo].[dim_Symbol]
-    SELECT  
-        Symbol_SK = @MaxSK + ROW_NUMBER() OVER(ORDER BY Symbol)  
-        , Symbol
-        , Name
-        ,Market
-    FROM 
-        (SELECT DISTINCT
-        sdp.Symbol 
-        , Name  = 'Stock ' + sdp.Symbol 
-        , Market = CASE SUBSTRING(Symbol,1,1)
-                        WHEN 'B' THEN 'NASDAQ'
-                        WHEN 'W' THEN 'NASDAQ'
-                        WHEN 'I' THEN 'NYSE'
-                        WHEN 'T' THEN 'NYSE'
-                        ELSE 'No Market'
-                    END
-        FROM 
-            [stg].[vw_StocksDailyPrices] sdp
-        WHERE 
-            sdp.Symbol NOT IN (SELECT Symbol FROM [dbo].[dim_Symbol])
-        ) stg
-    
-    END
-    GO
-    ```
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image151.png)
-  
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image152.png)
-
-1. Rename the query for reference. Right-click on **SQL query** in Explorer and select **Rename**.
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image153.png)
-
-1. In the **Rename** dialog box, under the **Name** field, enter +++Load the stock symbol dimension+++, then click on the **Rename** button.
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image154.png)
-
-
-### Task 4: Create the views
-
-1. Click on **New SQL query** dropdown in the command bar, then select **New SQL query**. We'll start building our schema in the next step.
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image144.png)
-
-    >[!Knowledge]Create views that support the aggregation of the data during the
-    >load. When the pipeline runs, data is copied from the KQL database
-    >into our staging table, where we'll aggregate all of the data for
-    >each stock into a min, max, and closing price for each day.
-
-1. In the query editor, copy and paste the following code. Click on the **Run** button to execute the query.
-
-    ```
-    4 - Create Staging Views.sql 
-    
-    CREATE VIEW [stg].[vw_StocksDailyPrices] 
-    AS 
-    SELECT 
-        Symbol = symbol
-        ,PriceDate = datestamp
-        ,MIN(price) as MinPrice
-        ,MAX(price) as MaxPrice
-        ,(SELECT TOP 1 price FROM [stg].[StocksPrices] sub
-        WHERE sub.symbol = prices.symbol and sub.datestamp = prices.datestamp
-        ORDER BY sub.timestamp DESC
-        ) as ClosePrice
-    FROM 
-        [stg].[StocksPrices] prices
-    GROUP BY
-        symbol, datestamp
-    GO
-    ************************
-    CREATE VIEW stg.vw_StocksDailyPricesEX
-    AS
-    SELECT
-        ds.[Symbol_SK]
-        ,dd.DateKey as PriceDateKey
-        ,MinPrice
-        ,MaxPrice
-        ,ClosePrice
-    FROM 
-        [stg].[vw_StocksDailyPrices] sdp
-    INNER JOIN [dbo].[dim_Date] dd
-        ON dd.DateKey = sdp.PriceDate
-    INNER JOIN [dbo].[dim_Symbol] ds
-        ON ds.Symbol = sdp.Symbol
-    GO
-    ```
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image155.png)
-  
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image156.png)
-
-1. Rename the query for reference. Right-click on **SQL query** in Explorer and select **Rename**.
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image157.png)
-
-1. In the **Rename** dialog box, under the **Name** field, enter `Create Staging Views`, then click on the **Rename** button.
-
-    ![A screenshot of a computer screen Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image158.png)
-
-
-### Task 5: Add activity to load symbols
-
-1. On the **StockDW** page, click on **PL_Refresh_DWH** on the left-sided navigation menu.
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image159.png)
-
-    >In the pipeline, add a new **Stored Procedure** activity
-    >named **Populate Symbols Dimension** that executes the procedure,
-    >which loads the stock symbols.
-    >
-    >This should be connected to the success output of the ForEach
-    >activity (not within the ForEach activity).
-
-1. At the bottom of the **ForEach** activity, select the green arrow to add a new Activity, then search for, and select, +++Stored procedure+++.
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image160.png)
-
-1. On the **General** tab, in the **Name field,** enter +++Populate Symbols Dimension+++
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image161.png)
-
-1. Click on the **Settings** tab, enter the following settings.
-
-    |           |           |
-    |------|------|
-    |Connection	| **StocksDW** Workspace|
-    |Stored procedure name	|+++[ETL].[sp_Dim_Symbol_Load]+++|
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image162.png)
-
-
-### Task 6: Create the procedure to load daily prices
-
-1. Select the **StockDW** icon on the left-sided navigation menu.
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image163.png)
-
-1. Click on **New SQL query** dropdown in the command bar, then select **New SQL query**. We'll start building our schema in the next step.
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image144.png)
-
-    >[!Knowledge]Next, you will run a script to create the procedure that builds the
-    >fact table. This procedure merges data from staging into the fact
-    >table. If the pipeline is running throughout the day, the values
-    >will be updated to reflect any changes in the min, max, and closing
-    >price.
-
-    >[!Note] Currently, Fabric data warehouse does not support the T-SQL
-    > merge statement; therefore, data will be updated and then inserted as
-    > needed.
-
-1. In the query editor, copy and paste the following code. Click on the **Run** button to execute the query.
-
-    ```
-    5 - ETL.sp_Fact_Stocks_Daily_Prices_Load.sql 
-    
-    CREATE PROCEDURE [ETL].[sp_Fact_Stocks_Daily_Prices_Load]
-    AS
-    BEGIN
-    BEGIN TRANSACTION
-    
-        UPDATE fact
-        SET 
-            fact.MinPrice = CASE 
-                            WHEN fact.MinPrice IS NULL THEN stage.MinPrice
-                            ELSE CASE WHEN fact.MinPrice < stage.MinPrice THEN fact.MinPrice ELSE stage.MinPrice END
-                        END
-            ,fact.MaxPrice = CASE 
-                            WHEN fact.MaxPrice IS NULL THEN stage.MaxPrice
-                            ELSE CASE WHEN fact.MaxPrice > stage.MaxPrice THEN fact.MaxPrice ELSE stage.MaxPrice END
-                        END
-            ,fact.ClosePrice = CASE 
-                            WHEN fact.ClosePrice IS NULL THEN stage.ClosePrice
-                            WHEN stage.ClosePrice IS NULL THEN fact.ClosePrice
-                            ELSE stage.ClosePrice
-                        END 
-        FROM [dbo].[fact_Stocks_Daily_Prices] fact  
-        INNER JOIN [stg].[vw_StocksDailyPricesEX] stage
-            ON fact.PriceDateKey = stage.PriceDateKey
-            AND fact.Symbol_SK = stage.Symbol_SK
-    
-        INSERT INTO [dbo].[fact_Stocks_Daily_Prices]  
-            (Symbol_SK, PriceDateKey, MinPrice, MaxPrice, ClosePrice)
-        SELECT
-            Symbol_SK, PriceDateKey, MinPrice, MaxPrice, ClosePrice
-        FROM 
-            [stg].[vw_StocksDailyPricesEX] stage
-        WHERE NOT EXISTS (
-            SELECT * FROM [dbo].[fact_Stocks_Daily_Prices] fact
-            WHERE fact.PriceDateKey = stage.PriceDateKey
-                AND fact.Symbol_SK = stage.Symbol_SK
-        )
-    
-    COMMIT
-    
-    END
-    GO
-    ```
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image164.png)
-  
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image165.png)
-
-1. Rename the query for reference. Right-click on **SQL query** in Explorer and select **Rename**.
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image166.png)
-
-1. In the **Rename** dialog box, under the **Name** field, enter +++ETL.sp_Fact_Stocks_Daily_Prices_Load+++, then click on the **Rename** button.
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image167.png)
-
-
-### Task 7: Add activity to the pipeline to load daily stock prices
-
-1. Select the **PL_Refresh_DWH** icon on the left-sided navigation menu.
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image168.png)
-
-1. To load the stocks prices from staging into the fact table, add another  **Stored Procedure**  activity to the pipeline by selecting the green arrow at the bottom of the **Stored procedure** activity, then search for, and select, +++Stored procedure+++.
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image169.png)
-
-1. On the general tab set the name to +++Populate Fact Stocks Daily Prices+++.
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image170.png)
-
-1. To connect the success output of the *Populate Symbols Dimension* to the new *Populate Fact Stocks Daily Prices* activity click on the **Settings** tab, and then enter the following settings.
-
-    |   |   |
-    |------|-----|
-    |Connection	|Select **StocksDW** from the dropdown list|
-    |Stored procedure name|	+++[ETL].[sp_Fact_Stocks_Daily_Prices_Load]+++|
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image171.png)
-
-
-### Task 8. Run the pipeline
-
-1. Run the pipeline by clicking on the **Run** button, and verify the pipeline runs and fact and dimension tables are being loaded.
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image172.png)
-
-1. In the **Save and run?** dialog box, click on **Save and run** button
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image132.png)
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image173.png)
-
-
-### Task 9: Schedule the pipeline
-
-Next, you will schedule the pipeline to run periodically. This will vary by business case, but this could be run frequently (every few minutes) or throughout the day.
-
->[!Note] In this specific case, as there are roughly 700k rows per
-> day, and KQL limits the query results to 500k, the pipeline must run
-> at least twice per day to stay current.
-
-1. To schedule the pipeline, click the **Schedule** button on the **Home** menu and set up a recurring schedule, such as hourly or every few minutes.
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image174.png)
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image175.png)
-
-
-## Exercise 7: Semantic Modeling
-
-One last step is to operationalize the data by creating a semantic model and viewing the data in Power BI.
-
-### Task 1: Create a semantic model
-
-A semantic model, conceptually, provides an abstraction of our data for consumption in business analytics. Typically, we expose data in our data warehouse via semantic model that is used in Power BI. At a basic level, they will include the relationships between tables.
-
-*Note: Power BI Datasets have recently been renamed to Semantic Models. In some cases, labels may not have been updated. The terms can be used interchangeably. Read more about this change [on the Power BI Blog](https://powerbi.microsoft.com/en-us/blog/datasets-renamed-to-semantic-models/).*
-
-When we created our data warehouse, a default semantic model was created automatically. We can leverage this in Power BI, but it also includes many artifacts of the table we may not need. So, we'll create a new semantic model with just our fact and two-dimension tables.
-
-1. Click on the **StockDW** icon on the left-sided navigation menu.
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image176.png)
-
-1. Click on the the browser **refresh** icon as shown in the below image.
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image177.png)
-
-1. In the Explorer expand the **StocksDW** \> **Schemas** \> **dbo** \> **Tables** path and then select **dim_Date**.
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image178.png)
-
-1. In StockDW page, select the **Reporting** tab and then select **New semantic model**.
-
-1. In the New semantic model tab, enter the name as +++StocksModel+++, and select only the fact and dimensions tables under **dbo** \> **Tables**, as we are concerned with **fact_Stocks_Daily_Prices**, **dim_Date**, and **dim_Symbol**. Click on the **Confirm** button.
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image179.png)
-
-
-### Task 2. Add relationships
-
-1. On the **StockDW** page, click on **RealTimeWorkspace@lab.LabInstance.Id** on the left-sided navigation menu and select **StockModel** from the bottom of the list.
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image180.png)
-
-    >[!Note] The model designer should automatically open after creating the
-    >semantic model above. If it doesn't, or if you'd like to return to
-    >the designer at a later time, you can do so by opening the model
-    >from the list of resources in the workspace, and then
-    >selecting **Open semantic Model** from the semantic model item.
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image181.png)
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image182.png)
-
-1. From the top right corner drop down the **Viewing** button and select **Editing**.
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image183.png)
-
-    >[!Knowledge] To create relationships between the fact and dimension tables, you will need to drag the key from the fact table to the corresponding key in the dimension table.
-
-1. For this data model, you need to define the relationship between different tables so that you can create reports and visualizations based on data coming across different tables. From the **fact_Stocks_Daily_Prices** table, drag the **PriceDateKey** field and drop it on the **DateKey** field in the **dim_Date** table to create a relationship. The **New relationship** dialog box appears.
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image184.png)
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image185.png)
-
-1. In the **New relationship** dialog box:
-
-    - **From table** is populated with **fact_Stocks_Daily_Prices** and the
-    column of **PriceDateKey.**
-  
-    - **To table** is populated with **dim_Date**  and the column of
-    **DateKey**
-  
-    - Cardinality: **Many to one (\*:1)**
-    - Cross filter direction: **Single**
-    - Leave the box next to **Make this relationship active** selected.
-    - Select **Save**.
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image186.png)
-  
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image187.png)
-  
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image188.png)
-
-    >[!Alert] If the relationship fails to apply simply perform the previous 2 steps again.
-
-
-1. From the **fact_Stocks_Daily_Prices** table, drag the **Symbol_SK** field and drop it on the **Symbol_SK**  field in the **dim_Symbol** table to create a relationship. The **New relationship** dialog box appears.
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image189.png)
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image190.png)
-
-1. In the **New relationship** dialog box:
-
-    - **From table** is populated with **fact_Stocks_Daily_Prices** and the
-    column of **Symbol_Sk.**
-  
-    - **To table** is populated with **dim_Symabol**  and the column of
-    **Symbol_Sk**
-  
-    - Cardinality: **Many to one (\*:1)**
-    - Cross filter direction: **Single**
-    - Leave the box next to **Make this relationship active** selected.
-    - Select **Ok**.
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image191.png)
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image192.png)
-  
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image193.png)
-  
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image194.png)
-
-    >[!Alert] If the relationship fails to apply simply perform the previous 2 steps again.
-
-
-### Task 3. Create a simple report
-
-1. Click on **File** \> **Create new report** to load the semantic model in Power BI.
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image195.png)
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image196.png)
-
-    >[!Knowledge]While we won't have much data yet to make much of a report,
-    >conceptually, we can build a report similar to below, which shows a
-    >report after the lab has been running for a week or so (The
-    >lakehouse module will import additional history to allow for more
-    >interesting reports). The top chart shows the closing price for each
-    >stock on each day, while the bottom one shows the high/low/close of
-    >the WHO stock.
-
-1. In the **Power BI** page, under **Visualizations**, click to the **Line chart** icon to add a **Column chart** to your report.
-
-1. On the **Data** pane, expand **fact_Stocks_Daily_Prices** and check the box next to **PriceDateKey**. This creates a column chart and adds the field to the **X-axis**.
-  
-1. On the **Data** pane, expand **fact_Stocks_Daily_Prices** and check the box next to **ClosePrice**. This adds the field to the **Y-axis.**
-  
-1. On the **Data** pane, expand **dim_Symbol** and check the box next to **Symbol**. This adds the field to the **Legend**.
-  
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image197.png)
-  
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image198.png)
-
-1. From the ribbon, select **File** \> **Save.**
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image199.png)
-
-1. In the Save your report dialog box, enter +++semantic report+++ as the name of your report and select **your workspace**. Click on the **Save button**.
-
-    ![A screenshot of a computer AI-generated content may be incorrect.](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image200.png)
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image201.png)
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image202.png)
-
-
-### Task 4: Clean up resources
-
-If you've finished exploring your data warehouse, you can delete the workspace you created for this exercise.
-
-1. In the bar on the left, select the icon for your workspace named +++RealTimeWorkspace@lab.LabInstance.Id+++ to view all of the items it contains.
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image203.png)
-
-1. In the top right of the menu on the toolbar, select **Workspace settings**.
-
-    ![](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image204.png)
-
-1. In the **General** section, navigate to the bottom and select **Remove this workspace**.
-
-    ![A screenshot of a computer Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image205.png)
-
-1. In the **Delete workspace?** dialog select the **Delete** button to remove your workspace.
-
-    ![A white background with black text Description automatically generated](https://raw.githubusercontent.com/technofocus-pte/aipwrdanlytcmsfbrcdepth/refs/heads/Cloud-slice/Labguides/Usecase%2006/media/image206.png)
-
-
-## **Summary**
-
-In this usecase, you've configured permissions and created necessary resources within the Azure portal such as Fabric Capacity, Workspace, and Storage Account. Then, you've deployed the stock generator app via Azure Container Instance using an ARM template to generate real-time stock data. Additionally, you've configured Eventstream in Microsoft Fabric to ingest data from Azure Event Hubs and prepared the KQL Database to store this data efficiently. In this lab, you've established a fully functional environment to proceed with subsequent lab exercises related to real-time analytics and data processing.
-
-You embarked on a comprehensive exploration of stock price data using Kusto Query Language (KQL). Starting with the creation of a KQL queryset named "StockQueryset," you executed a series of increasingly complex queries to analyze various facets of the data. From viewing sample records to calculating price differentials over time and identifying significant price gains, each query unveils valuable insights into the dynamics of stock prices. By leveraging windowing functions, aggregation techniques, and data partitioning, you gained a deeper understanding of stock price trends and fluctuations.
-
-Then, you've shifted the focus to optimizing Power BI reporting efficiency, where you configured refresh rates and crafted dynamic visualizations for real-time dashboards. By configuring refresh rates in the Power BI admin portal and creating Power BI reports based on the previously defined KQL queries, you ensured timely updates and enabled insightful visualization of stock price data. Through tasks like creating visualizations for percent change and configuring auto-refresh settings, you harnessed the full potential of Power BI to drive informed decision-making and enhanced business intelligence capabilities.
-
-You've configured a Synapse Data Warehouse in the Fabric workspace and established a robust data pipeline for data processing. You've begun this lab with creating the Synapse Data Warehouse and then proceeded to create staging and ETL objects necessary for data transformation. You've created schemas, tables, stored procedures, and pipelines to manage data flow efficiently.
-
-Then, you've delved into building dimension and fact tables essential for organizing data effectively for analytical purposes. You've created tables for storing daily stock prices, symbol details, and date information. Additionally, procedures are developed to load dimension tables with relevant data and populate fact tables with daily stock prices.
-
-You've created a semantic model in Synapse Data Warehouse, focusing on essential fact and dimension tables. After establishing the semantic model named "StocksModel," you've established relationships between the fact_Stocks_Daily_Prices table and the dim_Date and dim_Symbol tables to enable cohesive data analysis. Overall, this lab provides a comprehensive understanding of setting up a data warehouse environment and building a reliable data pipeline for analytics.
+> import re
+>
+> from pyspark.sql.functions import monotonically_increasing_id
+>
+> def insert_into_index(documents):
+>
+> """Uploads a list of 'documents' to Azure AI Search index."""
+>
+> url =
+> f"https://{AI_SEARCH_NAME}.search.windows.net/indexes/{AI_SEARCH_INDEX_NAME}/docs/index?api-version=2023-11-01"
+>
+> payload = json.dumps({"value": documents})
+>
+> headers = {
+>
+> "Content-Type": "application/json",
+>
+> "api-key": AI_SEARCH_API_KEY,
+>
+> }
+>
+> response = requests.request("POST", url, headers=headers,
+> data=payload)
+>
+> if response.status_code == 200 or response.status_code == 201:
+>
+> return "Success"
+>
+> else:
+>
+> return f"Failure: {response.text}"
+>
+> def make_safe_id(row_id: str):
+>
+> """Strips disallowed characters from row id for use as Azure AI search
+> document ID."""
+>
+> return re.sub("\[^0-9a-zA-Z\_-\]", "\_", row_id)
+>
+> def upload_rows(rows):
+>
+> """Uploads the rows in a Spark dataframe to Azure AI Search.
+>
+> Limits uploads to 1000 rows at a time due to Azure AI Search API
+> limits.
+>
+> """
+>
+> BATCH_SIZE = 1000
+>
+> rows = list(rows)
+>
+> for i in range(0, len(rows), BATCH_SIZE):
+>
+> row_batch = rows\[i : i + BATCH_SIZE\]
+>
+> documents = \[\]
+>
+> for row in rows:
+>
+> documents.append(
+>
+> {
+>
+> "id": make_safe_id(row\["unique_id"\]),
+>
+> "content": row\["chunk"\],
+>
+> "contentVector": row\["embeddings"\].tolist(),
+>
+> "@search.action": "upload",
+>
+> },
+>
+> )
+>
+> status = insert_into_index(documents)
+>
+> yield \[row_batch\[0\]\["row_index"\], row_batch\[-1\]\["row_index"\],
+> status\]
+>
+> \# Add ID to help track what rows were successfully uploaded
+>
+> df_embeddings = df_embeddings.withColumn("row_index",
+> monotonically_increasing_id())
+>
+> \# Run upload_batch on partitions of the dataframe
+>
+> res = df_embeddings.rdd.mapPartitions(upload_rows)
+>
+> display(res.toDF(\["start_index", "end_index", "insertion_status"\]))
+
+![](./media/image38.png)
+
+![](./media/image39.png)
+
+## Exercise 4: Retrieving Relevant Documents and Answering Questions
+
+After processing the document, we can proceed to pose a question. We
+will use SynapseML to convert the user's question into an embedding and
+then utilize cosine similarity to retrieve the top K document chunks
+that closely match the user's question.
+
+### Task 1: Configure Environment & Azure API Keys
+
+Create a new notebook in the Lakehouse and save it as rag_application.
+We'll use this notebook to build the RAG application.
+
+1.  Provide the credentials for access to Azure AI Search. You can copy
+    the values from the from Azure Portal.(Exercise 1\>Task 4)
+
+2.  Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷
+    Run cell** button and review the output
+
+> \# Azure AI Search
+>
+> AI_SEARCH_NAME = 'mysearchservice@lab.LabInstance.Id'
+>
+> AI_SEARCH_INDEX_NAME = 'rag-demo-index'
+>
+> AI_SEARCH_API_KEY = ''
+
+![](./media/image40.png)
+
+3.  The following function takes a user's question as input and converts
+    it into an embedding using the text-embedding-ada-002 model. This
+    code assumes you're using the Pre-built AI Services in Microsoft
+    Fabric
+
+4.  Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷
+    Run cell** button and review the output
+
+> def gen_question_embedding(user_question):
+>
+> """Generates embedding for user_question using SynapseML."""
+>
+> from synapse.ml.services import OpenAIEmbedding
+>
+> df_ques = spark.createDataFrame(\[(user_question, 1)\], \["questions",
+> "dummy"\])
+>
+> embedding = (
+>
+> OpenAIEmbedding()
+>
+> .setDeploymentName('text-embedding-ada-002')
+>
+> .setTextCol("questions")
+>
+> .setErrorCol("errorQ")
+>
+> .setOutputCol("embeddings")
+>
+> )
+>
+> df_ques_embeddings = embedding.transform(df_ques)
+>
+> row = df_ques_embeddings.collect()\[0\]
+>
+> question_embedding = row.embeddings.tolist()
+>
+> return question_embedding
+
+![](./media/image41.png)
+
+### Task 2: Retrieve Relevant Documents
+
+1.  The next step is to use the user question and its embedding to
+    retrieve the top K most relevant document chunks from the search
+    index. The following function retrieves the top K entries using
+    hybrid search
+
+2.  Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷
+    Run cell** button and review the output
+
+> import json
+>
+> import requests
+>
+> def retrieve_top_chunks(k, question, question_embedding):
+>
+> """Retrieve the top K entries from Azure AI Search using hybrid
+> search."""
+>
+> url =
+> f"https://{AI_SEARCH_NAME}.search.windows.net/indexes/{AI_SEARCH_INDEX_NAME}/docs/search?api-version=2023-11-01"
+>
+> payload = json.dumps({
+>
+> "search": question,
+>
+> "top": k,
+>
+> "vectorQueries": \[
+>
+> {
+>
+> "vector": question_embedding,
+>
+> "k": k,
+>
+> "fields": "contentVector",
+>
+> "kind": "vector"
+>
+> }
+>
+> \]
+>
+> })
+>
+> headers = {
+>
+> "Content-Type": "application/json",
+>
+> "api-key": AI_SEARCH_API_KEY,
+>
+> }
+>
+> response = requests.request("POST", url, headers=headers,
+> data=payload)
+>
+> output = json.loads(response.text)
+>
+> return output
+
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image42.png)
+
+\[!Note\] With those functions defined, we can define a function that
+takes a user's question, generates an embedding for the question,
+retrieves the top K document chunks, and concatenates the content of the
+retrieved documents to form the context for the user's question.
+
+3.  Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷
+    Run cell** button and review the output
+
+> def get_context(user_question, retrieved_k = 5):
+>
+> \# Generate embeddings for the question
+>
+> question_embedding = gen_question_embedding(user_question)
+>
+> \# Retrieve the top K entries
+>
+> output = retrieve_top_chunks(retrieved_k, user_question,
+> question_embedding)
+>
+> \# concatenate the content of the retrieved documents
+>
+> context = \[chunk\["content"\] for chunk in output\["value"\]\]
+>
+> return context
+
+![](./media/image43.png)
+
+### Task 3: Answering the User's Question
+
+Finally, we can define a function that takes a user's question,
+retrieves the context for the question, and sends both the context and
+the question to a large language model to generate a response. For this
+demo, we'll use the gpt-35-turbo-16k, a model that is optimized for
+conversation.
+
+1.  Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷
+    Run cell** button and review the output
+
+> from pyspark.sql import Row
+>
+> from synapse.ml.services.openai import OpenAIChatCompletion
+>
+> def make_message(role, content):
+>
+> return Row(role=role, content=content, name=role)
+>
+> def get_response(user_question):
+>
+> context = get_context(user_question)
+>
+> \# Write a prompt with context and user_question as variables
+>
+> prompt = f"""
+>
+> context: {context}
+>
+> Answer the question based on the context above.
+>
+> If the information to answer the question is not present in the given
+> context then reply "I don't know".
+>
+> """
+>
+> chat_df = spark.createDataFrame(
+>
+> \[
+>
+> (
+>
+> \[
+>
+> make_message(
+>
+> "system", prompt
+>
+> ),
+>
+> make_message("user", user_question),
+>
+> \],
+>
+> ),
+>
+> \]
+>
+> ).toDF("messages")
+>
+> chat_completion = (
+>
+> OpenAIChatCompletion()
+>
+> .setDeploymentName("gpt-35-turbo-16k") \# deploymentName could be one
+> of {gpt-35-turbo, gpt-35-turbo-16k}
+>
+> .setMessagesCol("messages")
+>
+> .setErrorCol("error")
+>
+> .setOutputCol("chat_completions")
+>
+> )
+>
+> result_df =
+> chat_completion.transform(chat_df).select("chat_completions.choices.message.content")
+>
+> result = \[\]
+>
+> for row in result_df.collect():
+>
+> content_string = ' '.join(row\['content'\])
+>
+> result.append(content_string)
+>
+> \# Join the list into a single string
+>
+> result = ' '.join(result)
+>
+> return result
+
+![](./media/image44.png)
+
+![](./media/image45.png)
+
+2.  Now, we can call that function with an example question to see the
+    response:
+
+3.  Use the **+ Code** icon below the cell output to add a new code cell
+    to the notebook, and enter the following code in it. Click on **▷
+    Run cell** button and review the output
+
+> import requests
+>
+> \# Azure Search configuration
+>
+> \# Use the configured service name and API key from earlier cells
+>
+> search_service_name = AI_SEARCH_NAME
+>
+> index_name = AI_SEARCH_INDEX_NAME
+>
+> api_key = AI_SEARCH_API_KEY
+>
+> \# Build a valid endpoint only if a service name is provided
+>
+> if not search_service_name:
+>
+>     raise ValueError("Azure AI Search service name (AI_SEARCH_NAME) is
+> empty. Please set it before running this cell.")
+>
+> endpoint = f"https://{search_service_name}.search.windows.net"
+>
+> api_version = "2023-07-01-Preview"
+>
+> search_url =
+> f"{endpoint}/indexes/{index_name}/docs/search?api-version={api_version}"
+>
+> headers = {
+>
+>     "Content-Type": "application/json",
+>
+>     "api-key": api_key,
+>
+> }
+>
+> def search_index(user_question, top_k: int = 1):
+>
+>     """Query the Azure AI Search index for the given question and
+> return raw results."""
+>
+>     if not api_key:
+>
+>         raise ValueError("Azure AI Search API key (AI_SEARCH_API_KEY)
+> is empty. Please set it before running this cell.")
+>
+>     payload = {
+>
+>         "search": user_question,
+>
+>         "queryType": "simple",  # Can be "semantic" if enabled in your
+> Azure Search
+>
+>         "top": top_k,
+>
+>     }
+>
+>     response = requests.post(search_url, headers=headers,
+> json=payload, timeout=30)
+>
+>     response.raise_for_status()
+>
+>     return response.json()
+>
+> def get_response(user_question: str, top_k: int = 1) -\> str:
+>
+>     """Return the top document's content for the given question, or a
+> fallback message."""
+>
+>     results_json = search_index(user_question, top_k=top_k)
+>
+>     results = results_json.get("value", \[\])
+>
+>     if not results:
+>
+>         return "No answer found in the knowledge base."
+>
+>     \# Return the 'content' field from the top result
+>
+>     return results\[0\].get("content", "").strip()
+>
+> \# Example usage
+>
+> user_question = "how do i make a booking?"
+>
+> answer = get_response(user_question)
+>
+> print(answer)
+
+![](./media/image46.png)
+
+![](./media/image47.png)
+
+### Task 4: Delete the resources
+
+To avoid incurring unnecessary Azure costs, you should delete the
+resources you created in this quickstart if they're no longer needed. To
+manage resources, you can use the [Azure
+portal](https://portal.azure.com/?azure-portal=true).
+
+1.  To delete the storage account, navigate to **Azure portal
+    Home** page, click on **Resource groups**.
+
+![A screenshot of a computer Description automatically
+generated](./media/image48.png)
+
+2.  Click on the assigned resource group.
+
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image49.png)
+
+3.  In the **Resource group** home page, select the resources Azure AI
+    services, Key valut and Search service.
+
+![](./media/image50.png)
+
+4.  Select **Delete**
+
+![](./media/image51.png)
+
+![A screenshot of a computer error AI-generated content may be
+incorrect.](./media/image52.png)
+
+5.  In the **Delete Resources** pane that appears on the right side,
+    navigate to **Enter delete to confirm deletion** field, then click
+    on the **Delete** button.
+
+![A screenshot of a computer AI-generated content may be
+incorrect.](./media/image53.png)
+
+6.  On **Delete confirmation** dialog box, click on **Delete** button.
+
+![A screenshot of a computer error Description automatically
+generated](./media/image54.png)
+
+7.  Open your browser, navigate to the address bar, and type or paste
+    the following URL: +++<https://app.fabric.microsoft.com/+++> then
+    press the **Enter** button.
+
+8.  Select the ***...*** option under the workspace name and
+    select **Workspace settings**.
+
+![](./media/image55.png)
+
+9.  Select **General** and click on **Remove this workspace.**
+
+![](./media/image56.png)
+
+10. Click on **Delete** in the warning that pops up.
+
+![A white background with black text Description automatically
+generated](./media/image57.png)
+
+11. Wait for a notification that the Workspace has been deleted, before
+    proceeding to the next lab.
+
+![](./media/image58.png)
